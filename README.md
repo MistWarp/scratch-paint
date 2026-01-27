@@ -1,6 +1,6 @@
-# PenguinMod/PenguinMod-Paint
+# MistWarp/scratch-paint
 
-Modified version of scratch-paint from TurboWarp for use in PenguinMod.
+Modified version of scratch-paint from Turbowarp and PenguinMod for use in MistWarp.
 Uses @turbowarp/paper as it includes some nice fixes.
 
 ## License
