@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ToolSelectComponent from '../tool-select-base/tool-select-base.jsx';
 import messages from '../../lib/messages.js';
-import triangleIcon from './triangle.svg';
+
+import {Triangle} from 'lucide-react';
 
 const TriangleModeComponent = props => (
     <ToolSelectComponent
         imgDescriptor={messages.triangle}
-        imgSrc={triangleIcon}
+        icon={Triangle}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
     />

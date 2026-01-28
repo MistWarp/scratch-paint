@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ToolSelectComponent from '../tool-select-base/tool-select-base.jsx';
 import messages from '../../lib/messages.js';
-import ovalIcon from './oval.svg';
+
+import {Circle} from 'lucide-react';
 
 const OvalModeComponent = props => (
     <ToolSelectComponent
         imgDescriptor={messages.oval}
-        imgSrc={ovalIcon}
+        icon={Circle}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
         keybinding="C"

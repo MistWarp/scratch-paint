@@ -8,7 +8,7 @@ $ui-background-blue: #e8edf1;
 
 $text-primary: var(--paint-text-primary, #575e75);
 
-$motion-primary: hsla(194, 100%, 50%);
+$motion-primary: var(--paint-looks-secondary-default, #FF8C1A);
 $motion-tertiary: #007da3;
 $motion-transparent: hsla(194, 100%, 50%, 0.35);
 

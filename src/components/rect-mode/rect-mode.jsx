@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ToolSelectComponent from '../tool-select-base/tool-select-base.jsx';
 import messages from '../../lib/messages.js';
-import rectIcon from './rectangle.svg';
+
+import {RectangleHorizontal} from 'lucide-react';
 
 const RectModeComponent = props => (
     <ToolSelectComponent
         imgDescriptor={messages.rect}
-        imgSrc={rectIcon}
+        icon={RectangleHorizontal}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
         keybinding="R"

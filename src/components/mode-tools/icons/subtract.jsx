@@ -1,0 +1,65 @@
+import React from 'react';
+
+const ShapeSubtractIcon = props => (
+    <svg
+        {...props}
+        width="20px"
+        height="20px"
+        viewBox="0 0 20 20"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <title>subtract</title>
+        <desc>Created with Sketch.</desc>
+        <defs />
+        <g
+            id="Page-1"
+            stroke="none"
+            strokeWidth="1"
+            fill="none"
+            fillRule="evenodd"
+        >
+            <g id="copy-v2">
+                <g
+                    id="copy"
+                    transform="translate(0.000000, 0.000000)"
+                >
+                    <circle
+                        cx="10"
+                        cy="10"
+                        r="10"
+                        fill="currentColor"
+                        style={{color: 'var(--paint-looks-secondary-default, #FF8C1A)'}}
+                    />
+                    <g
+                        id="copy"
+                        transform="translate(1.000000, 1.000000) scale(0.9)"
+                    >
+                        <rect
+                            x="2.5"
+                            y="8"
+                            width="8.5"
+                            height="8.5"
+                            rx="1"
+                            fill="white"
+                        />
+                        <circle
+                            cx="12.5"
+                            cy="7.5"
+                            r="5"
+                            fill="currentColor"
+                            style={{color: 'var(--paint-looks-secondary-default, #FF8C1A)'}}
+                        />
+                        <circle
+                            cx="12.5"
+                            cy="7.5"
+                            r="5"
+                            fill="#ffffff80"
+                        />
+                    </g>
+                </g>
+            </g>
+        </g>
+    </svg>);
+
+export default ShapeSubtractIcon;

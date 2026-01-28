@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ToolSelectComponent from '../tool-select-base/tool-select-base.jsx';
 import messages from '../../lib/messages.js';
-import eraserIcon from './eraser.svg';
+
+import {Eraser} from 'lucide-react';
 
 const EraserModeComponent = props => (
     <ToolSelectComponent
         imgDescriptor={messages.eraser}
-        imgSrc={eraserIcon}
+        icon={Eraser}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
         keybinding="E"

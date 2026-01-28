@@ -21,14 +21,7 @@ import layout from '../../lib/layout-constants';
 import {hideLabel} from '../../lib/hide-label';
 import styles from './fixed-tools.css';
 
-import groupIcon from './icons/group.svg';
-import redoIcon from './icons/redo.svg';
-import sendBackIcon from './icons/send-back.svg';
-import sendBackwardIcon from './icons/send-backward.svg';
-import sendForwardIcon from './icons/send-forward.svg';
-import sendFrontIcon from './icons/send-front.svg';
-import undoIcon from './icons/undo.svg';
-import ungroupIcon from './icons/ungroup.svg';
+import {Group, Ungroup, Redo, Undo, BringToFront, SendToBack, ArrowUp, ArrowDown} from 'lucide-react';
 
 const BufferedInput = BufferedInputHOC(Input);
 const messages = defineMessages({
@@ -127,14 +120,13 @@ const FixedToolsComponent = props => {
                         disabled={undoDisabled}
                         onClick={props.onUndo}
                     >
-                        <img
+                        <Undo
                             alt={props.intl.formatMessage(messages.undo)}
                             className={classNames(
                                 styles.buttonGroupButtonIcon,
                                 styles.undoIcon
                             )}
                             draggable={false}
-                            src={undoIcon}
                         />
                     </Button>
                     <Button
@@ -149,11 +141,13 @@ const FixedToolsComponent = props => {
                         disabled={redoDisabled}
                         onClick={props.onRedo}
                     >
-                        <img
-                            alt={props.intl.formatMessage(messages.redo)}
-                            className={styles.buttonGroupButtonIcon}
+                        <Redo
+                            alt={props.intl.formatMessage(messages.undo)}
+                            className={classNames(
+                                styles.buttonGroupButtonIcon,
+                                styles.undoIcon
+                            )}
                             draggable={false}
-                            src={redoIcon}
                         />
                     </Button>
                 </ButtonGroup>
@@ -165,14 +159,14 @@ const FixedToolsComponent = props => {
                     <LabeledIconButton
                         disabled={!shouldShowGroup()}
                         hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={groupIcon}
+                        icon={Group}
                         title={props.intl.formatMessage(messages.group)}
                         onClick={props.onGroup}
                     />
                     <LabeledIconButton
                         disabled={!shouldShowUngroup()}
                         hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={ungroupIcon}
+                        icon={Ungroup}
                         title={props.intl.formatMessage(messages.ungroup)}
                         onClick={props.onUngroup}
                     />
@@ -185,14 +179,14 @@ const FixedToolsComponent = props => {
                     <LabeledIconButton
                         disabled={!shouldShowBringForward()}
                         hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={sendForwardIcon}
+                        icon={ArrowUp}
                         title={props.intl.formatMessage(messages.forward)}
                         onClick={props.onSendForward}
                     />
                     <LabeledIconButton
                         disabled={!shouldShowSendBackward()}
                         hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={sendBackwardIcon}
+                        icon={ArrowDown}
                         title={props.intl.formatMessage(messages.backward)}
                         onClick={props.onSendBackward}
                     />
@@ -205,14 +199,14 @@ const FixedToolsComponent = props => {
                         <LabeledIconButton
                             disabled={!shouldShowBringForward()}
                             hideLabel={hideLabel(props.intl.locale)}
-                            imgSrc={sendFrontIcon}
+                            icon={BringToFront}
                             title={props.intl.formatMessage(messages.front)}
                             onClick={props.onSendToFront}
                         />
                         <LabeledIconButton
                             disabled={!shouldShowSendBackward()}
                             hideLabel={hideLabel(props.intl.locale)}
-                            imgSrc={sendBackIcon}
+                            icon={SendToBack}
                             title={props.intl.formatMessage(messages.back)}
                             onClick={props.onSendToBack}
                         />
@@ -247,10 +241,9 @@ const FixedToolsComponent = props => {
                                         disabled={!shouldShowBringForward()}
                                         onClick={props.onSendToFront}
                                     >
-                                        <img
+                                        <BringToFront
                                             className={styles.menuItemIcon}
                                             draggable={false}
-                                            src={sendFrontIcon}
                                         />
                                         <span>{props.intl.formatMessage(messages.front)}</span>
                                     </Button>
@@ -261,10 +254,9 @@ const FixedToolsComponent = props => {
                                         disabled={!shouldShowSendBackward()}
                                         onClick={props.onSendToBack}
                                     >
-                                        <img
+                                        <SendToBack
                                             className={styles.menuItemIcon}
                                             draggable={false}
-                                            src={sendBackIcon}
                                         />
                                         <span>{props.intl.formatMessage(messages.back)}</span>
                                     </Button>

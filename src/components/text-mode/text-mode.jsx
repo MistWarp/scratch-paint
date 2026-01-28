@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import messages from '../../lib/messages.js';
 import ToolSelectComponent from '../tool-select-base/tool-select-base.jsx';
 
-import textIcon from './text.svg';
+import {CaseSensitive} from 'lucide-react';
 
 const TextModeComponent = props => (
     <ToolSelectComponent
         imgDescriptor={messages.text}
-        imgSrc={textIcon}
+        icon={CaseSensitive}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
         keybinding="T"

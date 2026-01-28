@@ -10,37 +10,74 @@ import Button from '../button/button.jsx';
 
 import styles from './labeled-icon-button.css';
 
+const renderIcon = icon => {
+    if (!icon) return null;
+
+    if (React.isValidElement(icon)) {
+        return React.cloneElement(icon, {
+            className: classNames(
+                styles.editFieldIcon,
+                icon.props.className
+            )
+        });
+    }
+
+    return React.createElement(icon, {
+        className: styles.editFieldIcon
+    });
+};
+
 const LabeledIconButton = ({
     className,
     hideLabel,
     imgAlt,
     imgSrc,
+    icon,
     onClick,
     title,
     ...props
-}) => (
-    <Button
-        className={classNames(className, styles.modEditField)}
-        onClick={onClick}
-        {...props}
-    >
-        <img
-            alt={imgAlt || title}
-            className={styles.editFieldIcon}
-            draggable={false}
-            src={imgSrc}
-            title={title}
-        />
-        {!hideLabel && <span className={styles.editFieldTitle}>{title}</span>}
-    </Button>
-);
+}) => {
+    let iconElement = null;
+
+    if (imgSrc) {
+        iconElement = (
+            <img
+                alt={imgAlt || title}
+                className={styles.editFieldIcon}
+                draggable={false}
+                src={imgSrc}
+                title={title}
+            />
+        );
+    } else {
+        iconElement = renderIcon(icon);
+    }
+
+    return (
+        <Button
+            className={classNames(className, styles.modEditField)}
+            onClick={onClick}
+            {...props}
+        >
+            {iconElement}
+            {!hideLabel && (
+                <span className={styles.editFieldTitle}>{title}</span>
+            )}
+        </Button>
+    );
+};
 
 LabeledIconButton.propTypes = {
     className: PropTypes.string,
     hideLabel: PropTypes.bool,
     highlighted: PropTypes.bool,
     imgAlt: PropTypes.string,
-    imgSrc: PropTypes.string.isRequired,
+    imgSrc: PropTypes.string,
+    icon: PropTypes.oneOfType([
+        PropTypes.func,
+        PropTypes.object,
+        PropTypes.node
+    ]),
     onClick: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired
 };

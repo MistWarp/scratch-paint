@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ToolSelectComponent from '../tool-select-base/tool-select-base.jsx';
 
-import penIcon from './pen.svg';
+import {PenTool} from 'lucide-react';
 
 const PenModeComponent = props => (
     <ToolSelectComponent
@@ -11,7 +11,7 @@ const PenModeComponent = props => (
             description: 'Label for the pen tool, which draws outlines',
             id: 'paint.penMode.pen'
         }}
-        imgSrc={penIcon}
+        icon={PenTool}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
     />

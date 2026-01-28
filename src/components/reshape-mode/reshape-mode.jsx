@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import messages from '../../lib/messages.js';
 import ToolSelectComponent from '../tool-select-base/tool-select-base.jsx';
 
-import reshapeIcon from './reshape.svg';
+import {SplinePointer} from 'lucide-react';
 
 const ReshapeModeComponent = props => (
     <ToolSelectComponent
         imgDescriptor={messages.reshape}
-        imgSrc={reshapeIcon}
+        icon={SplinePointer}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
         keybinding="A"

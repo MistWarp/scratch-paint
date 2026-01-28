@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ToolSelectComponent from '../tool-select-base/tool-select-base.jsx';
 import messages from '../../lib/messages.js';
-import brushIcon from './brush.svg';
+
+import {Paintbrush} from 'lucide-react';
 
 const BrushModeComponent = props => (
     <ToolSelectComponent
         imgDescriptor={messages.brush}
-        imgSrc={brushIcon}
+        icon={Paintbrush}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
         keybinding="B"

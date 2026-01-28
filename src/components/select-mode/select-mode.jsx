@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import messages from '../../lib/messages.js';
 import ToolSelectComponent from '../tool-select-base/tool-select-base.jsx';
 
-import selectIcon from './select.svg';
+import {SquareDashedMousePointer} from 'lucide-react';
 
 const SelectModeComponent = props => (
     <ToolSelectComponent
         imgDescriptor={messages.select}
-        imgSrc={selectIcon}
+        icon={SquareDashedMousePointer}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
         keybinding="S"
