@@ -17,11 +17,12 @@ Edited to add input-range-small
     font-size: 0.75rem;
     font-weight: bold;
     color: $text-primary;
+    background-color: $ui-background;
 
     border-width: 1px;
     border-style: solid;
     border-color: $form-border;
-    border-radius: 2rem;
+    border-radius: 10px;
 
     outline: none;
     cursor: text;

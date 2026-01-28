@@ -16,7 +16,7 @@ const MiterLineJoin = props => (
             fillOpacity="0.25"
             strokeWidth="4"
             strokeLinejoin="miter"
-            style={{color: 'var(--paint-looks-secondary-default, #FF8C1A)'}}
+            style={{color: 'var(--paint-text-primary-default, #FFF)'}}
         ><path d="M3,17 L10,3 L17,17" /></g>
     </svg>
 );

@@ -47,7 +47,8 @@ import {
     ClipboardCopy, Scissors, ClipboardPaste,
     Trash, FlipHorizontal2, FlipVertical2,
     Plus, TextAlignStart, TextAlignCenter,
-    TextAlignEnd
+    TextAlignEnd,
+    SquaresIntersect, SquaresUnite, SquaresSubtract, SquaresExclude
 } from 'lucide-react';
 
 import RoundLine from './icons/round-line.jsx';
@@ -55,10 +56,6 @@ import SquareLine from './icons/square-line.jsx';
 import MiterLineJoin from './icons/miter-line-join.jsx';
 import RoundLineJoin from './icons/round-line-join.jsx';
 import BevelLineJoin from './icons/bevel-line-join.jsx';
-import ShapeMergeIcon from './icons/merge.jsx';
-import ShapeMaskIcon from './icons/mask.jsx';
-import ShapeSubtractIcon from './icons/subtract.jsx';
-import ShapeFilterIcon from './icons/filter.jsx';
 import bitBrushIcon from '../bit-brush-mode/brush.svg';
 import bitEraserIcon from '../bit-eraser-mode/eraser.svg';
 import bitLineIcon from '../bit-line-mode/line.svg';
@@ -218,7 +215,7 @@ const ModeToolsComponent = props => {
             id: 'pm.paint.modeTools.mask'
         },
         filter: {
-            defaultMessage: 'Filter',
+            defaultMessage: 'Exclude',
             description: 'Label for the button that xors two selected objects together',
             id: 'pm.paint.modeTools.filter'
         },
@@ -620,25 +617,25 @@ const ModeToolsComponent = props => {
             <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
                 <LabeledIconButton
                     hideLabel={hideLabel(props.intl.locale)}
-                    icon={ShapeMergeIcon}
+                    icon={SquaresUnite}
                     title={props.intl.formatMessage(messages.merge)}
                     onClick={props.onMergeShape}
                 />
                 <LabeledIconButton
                     hideLabel={hideLabel(props.intl.locale)}
-                    icon={ShapeMaskIcon}
+                    icon={SquaresIntersect}
                     title={props.intl.formatMessage(messages.mask)}
                     onClick={props.onMaskShape}
                 />
                 <LabeledIconButton
                     hideLabel={hideLabel(props.intl.locale)}
-                    icon={ShapeSubtractIcon}
+                    icon={SquaresSubtract}
                     title={props.intl.formatMessage(messages.subtract)}
                     onClick={props.onSubtractShape}
                 />
                 <LabeledIconButton
                     hideLabel={hideLabel(props.intl.locale)}
-                    icon={ShapeFilterIcon}
+                    icon={SquaresExclude}
                     title={props.intl.formatMessage(messages.filter)}
                     onClick={props.onExcludeShape}
                 />

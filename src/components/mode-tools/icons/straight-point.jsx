@@ -22,7 +22,7 @@ const StraightPoint = props => (
             <g
                 id="straight-point"
                 fill="currentColor"
-                style={{color: 'var(--paint-looks-secondary-default, #FF8C1A)'}}
+                style={{color: 'var(--paint-text-primary-default, #FFF)'}}
             >
                 <polyline
                     id="Path-2"

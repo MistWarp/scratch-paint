@@ -21,7 +21,7 @@ const CurvedPoint = props => (
         >
             <g
                 id="curved-point"
-                style={{color: 'var(--paint-looks-secondary-default, #FF8C1A)'}}
+                style={{color: 'var(--paint-text-primary-default, #FFF)'}}
             >
                 <path
                     d="M2,15 C2,10.5818452 5.58151214,7 10.000744,7 C14.4184879,7 18,10.5818452 18,15"

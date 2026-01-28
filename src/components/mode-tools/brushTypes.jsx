@@ -9,8 +9,7 @@ import classNames from 'classnames';
 
 import styles from './mode-tools.css';
 
-import CircleBrush from './icons/circle-brush.jsx';
-import SquareBrush from './icons/square-brush.jsx';
+import {Circle, Square} from 'lucide-react';
 
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 
@@ -36,7 +35,7 @@ const BrushTypesComponent = props => (
                 }
                 onClick={() => props.onBrushChange('CIRCLE')}
             >
-                <CircleBrush
+                <Circle
                     alt={props.intl.formatMessage(messages.brushCircle)}
                     className={styles.buttonGroupButtonIcon}
                     draggable={false}
@@ -48,7 +47,7 @@ const BrushTypesComponent = props => (
                 }
                 onClick={() => props.onBrushChange('SQUARE')}
             >
-                <SquareBrush
+                <Square
                     alt={props.intl.formatMessage(messages.brushSquare)}
                     className={styles.buttonGroupButtonIcon}
                     draggable={false}

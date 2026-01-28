@@ -1,6 +1,6 @@
 import paper from '@turbowarp/paper';
 import classNames from 'classnames';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -43,11 +43,7 @@ import TextMode from '../../containers/text-mode.jsx';
 import Formats, {isBitmap, isVector} from '../../lib/format';
 import styles from './paint-editor.css';
 
-import bitmapIcon from './icons/bitmap.svg';
-import zoomInIcon from './icons/zoom-in.svg';
-import zoomOutIcon from './icons/zoom-out.svg';
-import zoomResetIcon from './icons/zoom-reset.svg';
-import themeIcon from './icons/theme.svg';
+import {Image, ZoomIn, ZoomOut, Equal, Palette} from 'lucide-react';
 
 const messages = defineMessages({
     bitmap: {
@@ -269,10 +265,9 @@ const PaintEditorComponent = props => (
                             className={styles.bitmapButton}
                             onClick={props.onSwitchToBitmap}
                         >
-                            <img
+                            <Image
                                 className={styles.bitmapButtonIcon}
                                 draggable={false}
-                                src={bitmapIcon}
                             />
                             <span className={styles.buttonText}>
                                 {props.intl.formatMessage(messages.bitmap)}
@@ -283,10 +278,9 @@ const PaintEditorComponent = props => (
                                 className={styles.bitmapButton}
                                 onClick={props.onSwitchToVector}
                             >
-                                <img
+                                <Image
                                     className={styles.bitmapButtonIcon}
                                     draggable={false}
-                                    src={bitmapIcon}
                                 />
                                 <span className={styles.buttonText}>
                                     {props.intl.formatMessage(messages.vector)}
@@ -300,33 +294,30 @@ const PaintEditorComponent = props => (
                                 className={styles.buttonGroupButton}
                                 onClick={props.onZoomOut}
                             >
-                                <img
+                                <ZoomOut
                                     alt="Zoom Out"
                                     className={styles.buttonGroupButtonIcon}
                                     draggable={false}
-                                    src={zoomOutIcon}
                                 />
                             </Button>
                             <Button
                                 className={styles.buttonGroupButton}
                                 onClick={props.onZoomReset}
                             >
-                                <img
+                                <Equal
                                     alt="Zoom Reset"
                                     className={styles.buttonGroupButtonIcon}
                                     draggable={false}
-                                    src={zoomResetIcon}
                                 />
                             </Button>
                             <Button
                                 className={styles.buttonGroupButton}
                                 onClick={props.onZoomIn}
                             >
-                                <img
+                                <ZoomIn
                                     alt="Zoom In"
                                     className={styles.buttonGroupButtonIcon}
                                     draggable={false}
-                                    src={zoomInIcon}
                                 />
                             </Button>
                         </ButtonGroup>
@@ -335,11 +326,10 @@ const PaintEditorComponent = props => (
                                 className={styles.buttonGroupButton}
                                 onClick={props.onChangeTheme}
                             >
-                                <img
+                                <Palette
                                     alt="Change theme"
                                     className={styles.buttonGroupButtonIcon}
                                     draggable={false}
-                                    src={themeIcon}
                                 />
                             </Button>
                         </ButtonGroup>
