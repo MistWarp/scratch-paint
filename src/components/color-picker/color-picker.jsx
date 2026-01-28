@@ -14,10 +14,10 @@ import {MIXED} from '../../helper/style-path';
 import eyeDropperIcon from './icons/eye-dropper.svg';
 import noFillIcon from '../color-button/no-fill.svg';
 import mixedFillIcon from '../color-button/mixed-fill.svg';
-import fillHorzGradientIcon from './icons/fill-horz-gradient-enabled.svg';
-import fillRadialIcon from './icons/fill-radial-enabled.svg';
-import fillSolidIcon from './icons/fill-solid-enabled.svg';
-import fillVertGradientIcon from './icons/fill-vert-gradient-enabled.svg';
+import FillHorzGradientIcon from './icons/fill-horz-gradient-enabled.jsx';
+import FillRadialIcon from './icons/fill-radial-enabled.jsx';
+import FillSolidIcon from './icons/fill-solid-enabled.jsx';
+import FillVertGradientIcon from './icons/fill-vert-gradient-enabled.jsx';
 import swapIcon from './icons/swap.svg';
 import Modes from '../../lib/modes';
 import alphaBackground from './alpha.png';
@@ -91,47 +91,43 @@ class ColorPickerComponent extends React.Component {
                     <div>
                         <div className={styles.row}>
                             <div className={styles.gradientPickerRow}>
-                                <img
+                                <FillSolidIcon
                                     className={classNames({
                                         [styles.inactiveGradient]: this.props.gradientType !== GradientTypes.SOLID,
                                         [styles.clickable]: true
                                     })}
                                     draggable={false}
-                                    src={fillSolidIcon}
                                     onClick={this.props.onChangeGradientTypeSolid}
                                     width={20}
                                     height={20}
                                 />
-                                <img
+                                <FillHorzGradientIcon
                                     className={classNames({
                                         [styles.inactiveGradient]:
                                             this.props.gradientType !== GradientTypes.HORIZONTAL,
                                         [styles.clickable]: true
                                     })}
                                     draggable={false}
-                                    src={fillHorzGradientIcon}
                                     onClick={this.props.onChangeGradientTypeHorizontal}
                                     width={20}
                                     height={20}
                                 />
-                                <img
+                                <FillVertGradientIcon
                                     className={classNames({
                                         [styles.inactiveGradient]: this.props.gradientType !== GradientTypes.VERTICAL,
                                         [styles.clickable]: true
                                     })}
                                     draggable={false}
-                                    src={fillVertGradientIcon}
                                     onClick={this.props.onChangeGradientTypeVertical}
                                     width={20}
                                     height={20}
                                 />
-                                <img
+                                <FillRadialIcon
                                     className={classNames({
                                         [styles.inactiveGradient]: this.props.gradientType !== GradientTypes.RADIAL,
                                         [styles.clickable]: true
                                     })}
                                     draggable={false}
-                                    src={fillRadialIcon}
                                     onClick={this.props.onChangeGradientTypeRadial}
                                     width={20}
                                     height={20}
