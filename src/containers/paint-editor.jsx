@@ -22,7 +22,7 @@ import {setCustomFonts} from '../reducers/custom-fonts';
 
 import {getSelectedLeafItems} from '../helper/selection';
 import {convertToBitmap, convertToVector} from '../helper/bitmap';
-import {resizeView, resetZoom, zoomOnSelection, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
+import {resizeView, zoomOnSelection, zoomToFit, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
 import EyeDropperTool from '../helper/tools/eye-dropper';
 
 import Modes, {BitmapModes, VectorModes} from '../lib/modes';
@@ -251,7 +251,7 @@ class PaintEditor extends React.Component {
         this.handleSetSelectedItems();
     }
     handleZoomReset () {
-        resetZoom();
+        zoomToFit(isBitmap(this.props.format), window.matchMedia('(max-width: 600px)').matches);
         this.props.updateViewBounds(paper.view.matrix);
         this.handleSetSelectedItems();
     }

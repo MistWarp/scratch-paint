@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import React from 'react';
+import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
 
 import PaperCanvas from '../../containers/paper-canvas.jsx';
@@ -43,7 +44,7 @@ import TextMode from '../../containers/text-mode.jsx';
 import Formats, {isBitmap, isVector} from '../../lib/format';
 import styles from './paint-editor.css';
 
-import {Image, ZoomIn, ZoomOut, Equal, Palette} from 'lucide-react';
+import {Image, ZoomIn, ZoomOut, Scan, Palette, ChevronLeft, ChevronRight} from 'lucide-react';
 
 const messages = defineMessages({
     bitmap: {
@@ -55,8 +56,67 @@ const messages = defineMessages({
         defaultMessage: 'Convert to Vector',
         description: 'Label for button that converts the paint editor to vector mode',
         id: 'paint.paintEditor.vector'
+    },
+    bitmapHelp: {
+        defaultMessage: 'Convert this costume to bitmap. Converting it back will not restore editable vector shapes.',
+        description: 'Tooltip explaining the effect of converting a vector costume to bitmap',
+        id: 'paint.paintEditor.bitmapHelp'
+    },
+    vectorHelp: {
+        defaultMessage: 'Convert this costume to vector. The bitmap artwork will remain a pixel image.',
+        description: 'Tooltip explaining the effect of converting a bitmap costume to vector',
+        id: 'paint.paintEditor.vectorHelp'
     }
 });
+
+const ResponsiveToolStrip = props => {
+    const toolStrip = React.useRef(null);
+    const scrollTools = distance => {
+        if (toolStrip.current) {
+            toolStrip.current.scrollBy({left: distance, behavior: 'smooth'});
+        }
+    };
+    return (
+        <React.Fragment>
+            <MediaQuery minWidth={601}>
+                <div className={classNames(styles.modeSelector, props.modeSelectorClassName)}>
+                    {props.children}
+                </div>
+            </MediaQuery>
+            <MediaQuery maxWidth={600}>
+                <div className={styles.toolStripPanel}>
+                    <Button
+                        aria-label="Previous paint tools"
+                        className={styles.toolStripScrollButton}
+                        title="Previous paint tools"
+                        onClick={() => scrollTools(-240)} // eslint-disable-line react/jsx-no-bind
+                    >
+                        <ChevronLeft />
+                    </Button>
+                    <div
+                        className={classNames(styles.modeSelector, props.modeSelectorClassName)}
+                        ref={toolStrip}
+                    >
+                        {props.children}
+                    </div>
+                    <Button
+                        aria-label="More paint tools"
+                        className={styles.toolStripScrollButton}
+                        title="More paint tools"
+                        onClick={() => scrollTools(240)} // eslint-disable-line react/jsx-no-bind
+                    >
+                        <ChevronRight />
+                    </Button>
+                </div>
+            </MediaQuery>
+        </React.Fragment>
+    );
+};
+
+ResponsiveToolStrip.propTypes = {
+    children: PropTypes.node.isRequired,
+    modeSelectorClassName: PropTypes.string.isRequired
+};
 
 const PaintEditorComponent = props => (
     <div
@@ -143,7 +203,7 @@ const PaintEditorComponent = props => (
         <div className={styles.topAlignRow}>
             {/* Modes */}
             {props.canvas !== null && isVector(props.format) ? ( // eslint-disable-line no-negated-condition
-                <div className={styles.modeSelector}>
+                <ResponsiveToolStrip modeSelectorClassName={styles.vectorModeSelector}>
                     <SelectMode
                         onUpdateImage={props.onUpdateImage}
                     />
@@ -189,11 +249,11 @@ const PaintEditorComponent = props => (
                     <ArrowMode
                         onUpdateImage={props.onUpdateImage}
                     />
-                </div>
+                </ResponsiveToolStrip>
             ) : null}
 
             {props.canvas !== null && isBitmap(props.format) ? ( // eslint-disable-line no-negated-condition
-                <div className={styles.modeSelector}>
+                <ResponsiveToolStrip modeSelectorClassName={styles.bitmapModeSelector}>
                     <BitBrushMode
                         onUpdateImage={props.onUpdateImage}
                     />
@@ -220,7 +280,7 @@ const PaintEditorComponent = props => (
                     <BitSelectMode
                         onUpdateImage={props.onUpdateImage}
                     />
-                </div>
+                </ResponsiveToolStrip>
             ) : null}
 
             <div className={styles.controlsContainer}>
@@ -262,7 +322,9 @@ const PaintEditorComponent = props => (
                 <div className={styles.canvasControls}>
                     {isVector(props.format) ?
                         <Button
+                            aria-label={props.intl.formatMessage(messages.bitmapHelp)}
                             className={styles.bitmapButton}
+                            title={props.intl.formatMessage(messages.bitmapHelp)}
                             onClick={props.onSwitchToBitmap}
                         >
                             <Image
@@ -275,7 +337,9 @@ const PaintEditorComponent = props => (
                         </Button> :
                         isBitmap(props.format) ?
                             <Button
+                                aria-label={props.intl.formatMessage(messages.vectorHelp)}
                                 className={styles.bitmapButton}
+                                title={props.intl.formatMessage(messages.vectorHelp)}
                                 onClick={props.onSwitchToVector}
                             >
                                 <Image
@@ -289,9 +353,23 @@ const PaintEditorComponent = props => (
                     }
                     {/* Zoom controls */}
                     <InputGroup className={styles.zoomControls}>
-                        <ButtonGroup>
+                        <ButtonGroup className={styles.viewportControls}>
                             <Button
+                                aria-label="Canvas theme"
                                 className={styles.buttonGroupButton}
+                                title="Canvas theme"
+                                onClick={props.onChangeTheme}
+                            >
+                                <Palette
+                                    alt="Change theme"
+                                    className={styles.buttonGroupButtonIcon}
+                                    draggable={false}
+                                />
+                            </Button>
+                            <Button
+                                aria-label="Zoom out"
+                                className={classNames(styles.buttonGroupButton, styles.zoomStepButton)}
+                                title="Zoom out"
                                 onClick={props.onZoomOut}
                             >
                                 <ZoomOut
@@ -301,33 +379,24 @@ const PaintEditorComponent = props => (
                                 />
                             </Button>
                             <Button
+                                aria-label="Fit artwork"
                                 className={styles.buttonGroupButton}
+                                title="Fit artwork"
                                 onClick={props.onZoomReset}
                             >
-                                <Equal
-                                    alt="Zoom Reset"
+                                <Scan
                                     className={styles.buttonGroupButtonIcon}
                                     draggable={false}
                                 />
                             </Button>
                             <Button
-                                className={styles.buttonGroupButton}
+                                aria-label="Zoom in"
+                                className={classNames(styles.buttonGroupButton, styles.zoomStepButton)}
+                                title="Zoom in"
                                 onClick={props.onZoomIn}
                             >
                                 <ZoomIn
                                     alt="Zoom In"
-                                    className={styles.buttonGroupButtonIcon}
-                                    draggable={false}
-                                />
-                            </Button>
-                        </ButtonGroup>
-                        <ButtonGroup>
-                            <Button
-                                className={styles.buttonGroupButton}
-                                onClick={props.onChangeTheme}
-                            >
-                                <Palette
-                                    alt="Change theme"
                                     className={styles.buttonGroupButtonIcon}
                                     draggable={false}
                                 />

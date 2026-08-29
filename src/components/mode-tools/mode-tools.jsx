@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Dropdown from '../dropdown/dropdown.jsx';
+import Button from '../button/button.jsx';
 import MediaQuery from 'react-responsive';
 import layout from '../../lib/layout-constants';
 
@@ -604,7 +605,7 @@ const ModeToolsComponent = props => {
                             }
                             tipSize={.01}
                         >
-                            More
+                            Point options
                         </Dropdown>
                     </InputGroup>
                 </MediaQuery>
@@ -669,48 +670,173 @@ const ModeToolsComponent = props => {
         );
         return (
             <div className={classNames(props.className, styles.modeTools)}>
-                <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
-                    <LabeledIconButton
-                        hideLabel={hideLabel(props.intl.locale)}
-                        icon={ClipboardCopy}
-                        title={props.intl.formatMessage(messages.copy)}
-                        onClick={props.onCopyToClipboard}
-                    />
-                    <LabeledIconButton
-                        disabled={!(props.clipboardItems.length > 0)}
-                        hideLabel={hideLabel(props.intl.locale)}
-                        icon={ClipboardPaste}
-                        title={props.intl.formatMessage(messages.paste)}
-                        onClick={props.onPasteFromClipboard}
-                    />
-                    <LabeledIconButton
-                        hideLabel={hideLabel(props.intl.locale)}
-                        icon={Scissors}
-                        title={props.intl.formatMessage(messages.cut)}
-                        onClick={props.onCutToClipboard}
-                    />
-                </InputGroup>
-                <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
-                    <LabeledIconButton
-                        hideLabel={hideLabel(props.intl.locale)}
-                        icon={Trash}
-                        title={props.intl.formatMessage(messages.delete)}
-                        onClick={props.onDelete}
-                    />
-                </InputGroup>
-                <MediaQuery minWidth={layout.fullSizeEditorMinWidthExtraToolsCollapsed}>
-                    {/* Flip Options */}
-                    {flipOptions}
-                    {/* Movement Options */}
-                    {movementOptions}
-                    {/* Reshaping Methods */}
-                    {(props.mode === Modes.SELECT) ? (
-                        <MediaQuery minWidth={layout.fullSizeEditorMinWidthExtraTools}>
-                            {reshapingMethods}
+                <MediaQuery maxWidth={600}>
+                    <InputGroup className={styles.modLabeledIconHeight}>
+                        <Dropdown
+                            className={styles.modUnselect}
+                            enterExitTransitionDurationMs={20}
+                            popoverContent={
+                                <InputGroup
+                                    className={styles.modContextMenu}
+                                    rtl={props.rtl}
+                                >
+                                    <Button
+                                        className={styles.modMenuItem}
+                                        onClick={props.onCopyToClipboard}
+                                    >
+                                        <ClipboardCopy className={styles.menuItemIcon} />
+                                        <span>{props.intl.formatMessage(messages.copy)}</span>
+                                    </Button>
+                                    <Button
+                                        className={classNames(styles.modMenuItem, {
+                                            [styles.modDisabled]: !(props.clipboardItems.length > 0)
+                                        })}
+                                        disabled={!(props.clipboardItems.length > 0)}
+                                        onClick={props.onPasteFromClipboard}
+                                    >
+                                        <ClipboardPaste className={styles.menuItemIcon} />
+                                        <span>{props.intl.formatMessage(messages.paste)}</span>
+                                    </Button>
+                                    <Button
+                                        className={styles.modMenuItem}
+                                        onClick={props.onCutToClipboard}
+                                    >
+                                        <Scissors className={styles.menuItemIcon} />
+                                        <span>{props.intl.formatMessage(messages.cut)}</span>
+                                    </Button>
+                                    <Button
+                                        className={styles.modMenuItem}
+                                        onClick={props.onDelete}
+                                    >
+                                        <Trash className={styles.menuItemIcon} />
+                                        <span>{props.intl.formatMessage(messages.delete)}</span>
+                                    </Button>
+                                    <Button
+                                        className={classNames(styles.modMenuItem, styles.modTopDivider)}
+                                        onClick={props.onFlipHorizontal}
+                                    >
+                                        <FlipHorizontal2 className={styles.menuItemIcon} />
+                                        <span>{props.intl.formatMessage(messages.flipHorizontal)}</span>
+                                    </Button>
+                                    <Button
+                                        className={styles.modMenuItem}
+                                        onClick={props.onFlipVertical}
+                                    >
+                                        <FlipVertical2 className={styles.menuItemIcon} />
+                                        <span>{props.intl.formatMessage(messages.flipVertical)}</span>
+                                    </Button>
+                                    <Button
+                                        className={styles.modMenuItem}
+                                        onClick={props.onCenterSelection}
+                                    >
+                                        <Plus className={styles.menuItemIcon} />
+                                        <span>{props.intl.formatMessage(messages.movementCenter)}</span>
+                                    </Button>
+                                    {props.mode === Modes.SELECT && !props.format.startsWith('BITMAP') ? (
+                                        <React.Fragment>
+                                            <Button
+                                                className={classNames(styles.modMenuItem, styles.modTopDivider)}
+                                                onClick={props.onMergeShape}
+                                            >
+                                                <SquaresUnite className={styles.menuItemIcon} />
+                                                <span>{props.intl.formatMessage(messages.merge)}</span>
+                                            </Button>
+                                            <Button
+                                                className={styles.modMenuItem}
+                                                onClick={props.onMaskShape}
+                                            >
+                                                <SquaresIntersect className={styles.menuItemIcon} />
+                                                <span>{props.intl.formatMessage(messages.mask)}</span>
+                                            </Button>
+                                            <Button
+                                                className={styles.modMenuItem}
+                                                onClick={props.onSubtractShape}
+                                            >
+                                                <SquaresSubtract className={styles.menuItemIcon} />
+                                                <span>{props.intl.formatMessage(messages.subtract)}</span>
+                                            </Button>
+                                            <Button
+                                                className={styles.modMenuItem}
+                                                onClick={props.onExcludeShape}
+                                            >
+                                                <SquaresExclude className={styles.menuItemIcon} />
+                                                <span>{props.intl.formatMessage(messages.filter)}</span>
+                                            </Button>
+                                        </React.Fragment>
+                                    ) : null}
+                                </InputGroup>
+                            }
+                            tipSize={.01}
+                        >
+                            Edit
+                        </Dropdown>
+                    </InputGroup>
+                </MediaQuery>
+                <MediaQuery minWidth={601}>
+                    <React.Fragment>
+                        <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
+                            <LabeledIconButton
+                                hideLabel={hideLabel(props.intl.locale)}
+                                icon={ClipboardCopy}
+                                title={props.intl.formatMessage(messages.copy)}
+                                onClick={props.onCopyToClipboard}
+                            />
+                            <LabeledIconButton
+                                disabled={!(props.clipboardItems.length > 0)}
+                                hideLabel={hideLabel(props.intl.locale)}
+                                icon={ClipboardPaste}
+                                title={props.intl.formatMessage(messages.paste)}
+                                onClick={props.onPasteFromClipboard}
+                            />
+                            <LabeledIconButton
+                                hideLabel={hideLabel(props.intl.locale)}
+                                icon={Scissors}
+                                title={props.intl.formatMessage(messages.cut)}
+                                onClick={props.onCutToClipboard}
+                            />
+                        </InputGroup>
+                        <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
+                            <LabeledIconButton
+                                hideLabel={hideLabel(props.intl.locale)}
+                                icon={Trash}
+                                title={props.intl.formatMessage(messages.delete)}
+                                onClick={props.onDelete}
+                            />
+                        </InputGroup>
+                        <MediaQuery minWidth={layout.fullSizeEditorMinWidthExtraToolsCollapsed}>
+                            {/* Flip Options */}
+                            {flipOptions}
+                            {/* Movement Options */}
+                            {movementOptions}
+                            {/* Reshaping Methods */}
+                            {(props.mode === Modes.SELECT) ? (
+                                <MediaQuery minWidth={layout.fullSizeEditorMinWidthExtraTools}>
+                                    {reshapingMethods}
+                                </MediaQuery>
+                            ) : null}
+                            {(props.mode === Modes.SELECT) ? (
+                                <MediaQuery maxWidth={layout.fullSizeEditorMinWidthExtraTools - 1}>
+                                    <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
+                                        <Dropdown
+                                            className={styles.modUnselect}
+                                            enterExitTransitionDurationMs={20}
+                                            popoverContent={
+                                                <InputGroup
+                                                    className={styles.modContextMenu}
+                                                    rtl={props.rtl}
+                                                >
+                                                    {reshapingMethods}
+                                                </InputGroup>
+                                            }
+                                            tipSize={.01}
+                                        >
+                                            Combine
+                                        </Dropdown>
+                                    </InputGroup>
+                                </MediaQuery>
+                            ) : null}
                         </MediaQuery>
-                    ) : null}
-                    {(props.mode === Modes.SELECT) ? (
-                        <MediaQuery maxWidth={layout.fullSizeEditorMinWidthExtraTools - 1}>
+                        <MediaQuery maxWidth={layout.fullSizeEditorMinWidthExtraToolsCollapsed - 1}>
                             <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
                                 <Dropdown
                                     className={styles.modUnselect}
@@ -720,37 +846,18 @@ const ModeToolsComponent = props => {
                                             className={styles.modContextMenu}
                                             rtl={props.rtl}
                                         >
+                                            {flipOptions}
+                                            {movementOptions}
                                             {reshapingMethods}
                                         </InputGroup>
                                     }
                                     tipSize={.01}
                                 >
-                                    More
+                                    Transform
                                 </Dropdown>
                             </InputGroup>
                         </MediaQuery>
-                    ) : null}
-                </MediaQuery>
-                <MediaQuery maxWidth={layout.fullSizeEditorMinWidthExtraToolsCollapsed - 1}>
-                    <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
-                        <Dropdown
-                            className={styles.modUnselect}
-                            enterExitTransitionDurationMs={20}
-                            popoverContent={
-                                <InputGroup
-                                    className={styles.modContextMenu}
-                                    rtl={props.rtl}
-                                >
-                                    {flipOptions}
-                                    {movementOptions}
-                                    {reshapingMethods}
-                                </InputGroup>
-                            }
-                            tipSize={.01}
-                        >
-                            More
-                        </Dropdown>
-                    </InputGroup>
+                    </React.Fragment>
                 </MediaQuery>
             </div>
         );

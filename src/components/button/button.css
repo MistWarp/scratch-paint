@@ -8,12 +8,16 @@
 .button:active {
     background-color: $motion-transparent; 
 }
+.button:focus-visible {
+    outline: 2px solid $motion-primary;
+    outline-offset: 2px;
+}
 .highlighted.button {
     background-color: $motion-transparent; 
 }
 .mod-disabled {
     cursor: auto;
-    opacity: .5;
+    opacity: .58;
 }
 .mod-disabled:active {
     background: none;

@@ -184,7 +184,7 @@ const getActionBounds = isBitmap => {
     };
 };
 
-const zoomToFit = isBitmap => {
+const zoomToFit = (isBitmap, includeArtboard = false) => {
     resetZoom();
     let bounds;
     if (isBitmap) {
@@ -199,18 +199,23 @@ const zoomToFit = isBitmap => {
             }
         }
     }
+    if (includeArtboard) {
+        bounds = bounds ? bounds.unite(ART_BOARD_BOUNDS) : ART_BOARD_BOUNDS;
+    }
     if (bounds && bounds.width && bounds.height) {
         const canvas = paper.view.element;
+        const paddingPercent = includeArtboard ? 6 : PADDING_PERCENT;
         // Ratio of (sprite length plus padding on all sides) to viewport length.
         let ratio = paper.view.zoom *
             Math.max(
-                bounds.width * (1 + (2 * PADDING_PERCENT / 100)) / canvas.clientWidth,
-                bounds.height * (1 + (2 * PADDING_PERCENT / 100)) / canvas.clientHeight);
-        // Clamp ratio
-        ratio = Math.max(Math.min(1, ratio), MIN_RATIO);
-        if (ratio < 1) {
+                bounds.width * (1 + (2 * paddingPercent / 100)) / canvas.clientWidth,
+                bounds.height * (1 + (2 * paddingPercent / 100)) / canvas.clientHeight);
+        // The mobile artboard fit may zoom out far enough to show the full costume boundary.
+        // The standard fit behavior preserves the existing zoom-in-only interaction.
+        ratio = includeArtboard ? Math.max(ratio, MIN_RATIO) : Math.max(Math.min(1, ratio), MIN_RATIO);
+        if (includeArtboard || ratio < 1) {
             paper.view.center = bounds.center;
-            paper.view.zoom = paper.view.zoom / ratio;
+            paper.view.zoom = Math.max(OUTERMOST_ZOOM_LEVEL, paper.view.zoom / ratio);
             resizeCrosshair();
             clampViewBounds();
         }

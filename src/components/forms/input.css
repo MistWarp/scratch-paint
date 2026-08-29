@@ -64,3 +64,14 @@ Edited to add input-range-small
     width: 4rem;
     text-align: center;
 }
+
+@media only screen and (max-width: 600px) {
+    .input-form {
+        height: 2.75rem;
+        border-radius: 6px;
+    }
+
+    .input-small {
+        width: 4rem;
+    }
+}

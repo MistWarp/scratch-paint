@@ -137,7 +137,7 @@ $border-radius: 0.25rem;
     width: 100%;
     flex-grow: 1;
     min-width: 402px; /* Leave room for the border */
-    border: 1px solid $ui-background;
+    border: 1px solid $ui-pane-border;
     border-radius: .25rem;
     position: relative;
     overflow: visible;
@@ -158,7 +158,11 @@ $border-radius: 0.25rem;
 
 .zoom-controls {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
+}
+
+.viewport-controls {
+    margin: 0;
 }
 
 .color-picker-wrapper {
@@ -179,14 +183,22 @@ $border-radius: 0.25rem;
 
 .bitmap-button {
     display: flex;
-    border-radius: 5px;
-    background-color: $motion-primary;
-    padding: calc(2 * $grid-unit);
+    min-height: 36px;
+    align-items: center;
+    border: 1px solid $ui-pane-border;
+    border-radius: 6px;
+    background-color: $ui-background;
+    padding: $grid-unit calc(2 * $grid-unit);
     line-height: 1.5rem;
-    font-size: calc(3 * $grid-unit);
-    font-weight: bold;
-    color: white;
+    font-size: .75rem;
+    font-weight: 600;
+    color: $text-primary;
     justify-content: center;
+}
+
+.bitmap-button:hover {
+    border-color: $motion-primary;
+    color: $motion-primary;
 }
 
 [dir="ltr"] .bitmap-button-icon {
@@ -211,6 +223,190 @@ $border-radius: 0.25rem;
         margin-right: $grid-unit;
         margin-left: $grid-unit;
     }
+}
+
+@media only screen and (max-width: 600px) {
+    .editor-container {
+        min-width: 0;
+        padding: $grid-unit;
+    }
+
+    .editor-container-top {
+        min-width: 0;
+        padding-bottom: $grid-unit;
+        border-bottom: 0;
+        overflow: visible;
+    }
+
+    .editor-container-top > .row {
+        min-width: 0;
+        flex-wrap: wrap;
+        gap: $grid-unit 0;
+    }
+
+    .row + .row {
+        margin-top: calc(5 * $grid-unit);
+    }
+
+    .mod-labeled-icon-height {
+        min-width: 0;
+        height: auto;
+        min-height: 2.5rem;
+    }
+
+    .mod-mode-tools {
+        width: auto;
+        min-width: 0;
+        flex: 0 0 auto;
+        margin-left: calc(2 * $grid-unit);
+    }
+
+    [dir="rtl"] .mod-mode-tools {
+        margin-right: calc(2 * $grid-unit);
+        margin-left: 0;
+    }
+
+    [dir="ltr"] .mod-dashed-border,
+    [dir="rtl"] .mod-dashed-border {
+        padding-right: 0;
+        padding-left: 0;
+        border: 0;
+    }
+
+    .top-align-row {
+        min-width: 0;
+        padding-top: $grid-unit;
+        flex-direction: column;
+    }
+
+    .tool-strip-panel {
+        display: flex;
+        width: 100%;
+        box-sizing: border-box;
+        flex: 0 0 auto;
+        align-items: stretch;
+        border: 1px solid $ui-pane-border;
+        border-radius: .5rem;
+        background: $ui-background;
+        overflow: hidden;
+    }
+
+    .tool-strip-panel .mode-selector {
+        display: grid;
+        width: 0 !important;
+        min-width: 0 !important;
+        max-width: none;
+        position: static;
+        flex: 1 1 auto;
+        grid-auto-flow: column;
+        grid-auto-columns: 2.75rem;
+        grid-template-rows: 2.75rem;
+        justify-content: flex-start;
+        gap: $grid-unit;
+        padding: calc(2 * $grid-unit);
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        scrollbar-color: $ui-pane-border transparent;
+        scrollbar-width: thin;
+        touch-action: pan-x;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tool-strip-panel .mode-selector::-webkit-scrollbar {
+        height: 5px;
+    }
+
+    .tool-strip-panel .mode-selector::-webkit-scrollbar-thumb {
+        border-radius: 3px;
+        background: $ui-pane-border;
+    }
+
+    .tool-strip-scroll-button {
+        display: inline-grid;
+        width: 2.75rem;
+        min-width: 2.75rem;
+        flex: 0 0 2.75rem;
+        min-height: 3.75rem;
+        place-items: center;
+        color: $text-primary;
+        background: $ui-background;
+        z-index: 1;
+    }
+
+    .tool-strip-scroll-button svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    .tool-strip-scroll-button:first-child {
+        border-right: 1px solid $ui-pane-border;
+    }
+
+    .tool-strip-scroll-button:last-child {
+        border-left: 1px solid $ui-pane-border;
+    }
+
+    .vector-mode-selector {
+        grid-template-columns: none;
+    }
+
+    .bitmap-mode-selector {
+        grid-template-columns: none;
+    }
+
+    .controls-container {
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+        margin: $grid-unit 0 0;
+    }
+
+    .canvas-container {
+        min-width: 0;
+        border-radius: .5rem;
+        overflow: hidden;
+    }
+
+    .canvas-controls {
+        height: 2.75rem;
+        margin-top: $grid-unit;
+        gap: $grid-unit;
+    }
+
+    .bitmap-button {
+        min-width: 0;
+        min-height: 2.75rem;
+        flex: 0 1 auto;
+        padding: $grid-unit calc(2 * $grid-unit);
+    }
+
+    .zoom-controls {
+        flex: 0 0 auto;
+    }
+
+    .button-group-button.zoom-step-button {
+        display: none;
+    }
+
+    .button-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .button-group-button {
+        display: inline-grid;
+        width: 2.75rem;
+        height: 2.75rem;
+        padding: 0;
+        place-items: center;
+    }
+
 }
 
 .text-area {

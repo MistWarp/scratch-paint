@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 import paper from '@turbowarp/paper';
-import Formats from '../lib/format';
+import Formats, {isBitmap} from '../lib/format';
 import log from '../log/log';
 
 import {performSnapshot} from '../helper/undo';
@@ -322,8 +322,12 @@ class PaperCanvas extends React.Component {
         setWorkspaceBounds(true /* clipEmpty */);
         clampViewBounds();
         // Fix incorrect paper canvas scale on browser zoom reset
-        this.recalibrateSize();
-        this.props.updateViewBounds(paper.view.matrix);
+        this.recalibrateSize(() => {
+            if (window.matchMedia('(max-width: 600px)').matches) {
+                zoomToFit(isBitmap(this.props.format), true);
+            }
+            this.props.updateViewBounds(paper.view.matrix);
+        });
     }
     recalibrateSize (callback) {
         // Sets the size that Paper thinks the canvas is to the size the canvas element actually is.

@@ -131,3 +131,36 @@ $border-radius: 0.25rem;
     margin-right: 0;
     margin-left: calc(2 * $grid-unit);
 }
+
+@media only screen and (max-width: 600px) {
+    .row {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .costume-input {
+        width: min(8rem, 36vw);
+        height: 2.75rem;
+    }
+
+    .button-group-button {
+        display: inline-grid;
+        width: 2.75rem;
+        height: 2.75rem;
+        padding: 0;
+        place-items: center;
+    }
+
+    .mod-dashed-border {
+        display: none;
+    }
+
+    .mobile-menu-divider {
+        border-top: 1px solid $ui-pane-border;
+    }
+
+    .mod-menu-item {
+        min-height: 2.75rem;
+        padding: calc(2 * $grid-unit) calc(3 * $grid-unit);
+    }
+}

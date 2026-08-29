@@ -129,3 +129,45 @@ $border-radius: 0.25rem;
     height: 1.25rem;
     vertical-align: middle;
 }
+
+.mod-unselect {
+    user-select: none;
+}
+
+.mod-context-menu {
+    display: flex;
+    min-width: 12rem;
+    flex-direction: column;
+}
+
+.mod-menu-item {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: calc(2 * $grid-unit);
+    margin: 0 -$grid-unit;
+    padding: calc(2 * $grid-unit) calc(3 * $grid-unit);
+    color: $text-primary;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    white-space: nowrap;
+}
+
+.mod-menu-item:hover {
+    background: $motion-transparent;
+}
+
+.mod-top-divider {
+    border-top: 1px solid $ui-pane-border;
+}
+
+.mod-disabled {
+    color: $text-primary;
+    opacity: .62 !important;
+    cursor: default;
+}
+
+.menu-item-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: 0 0 auto;
+}

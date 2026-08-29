@@ -38,3 +38,10 @@ $scrollbar-padding: 4px;
     height: calc($scrollbar-size + $scrollbar-padding);
     padding-bottom: $scrollbar-padding;
 }
+
+@media only screen and (max-width: 600px) {
+    .vertical-scrollbar-wrapper,
+    .horizontal-scrollbar-wrapper {
+        display: none;
+    }
+}

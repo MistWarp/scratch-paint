@@ -70,10 +70,10 @@ const messages = defineMessages({
         description: 'Label for the `Send to back of canvas` button',
         id: 'paint.paintEditor.back'
     },
-    more: {
-        defaultMessage: 'More',
-        description: 'Label for dropdown to access more action buttons',
-        id: 'paint.paintEditor.more'
+    arrange: {
+        defaultMessage: 'Arrange',
+        description: 'Label for dropdown containing grouping and layer order actions',
+        id: 'paint.fixedTools.arrange'
     }
 });
 
@@ -109,6 +109,7 @@ const FixedToolsComponent = props => {
             <InputGroup>
                 <ButtonGroup>
                     <Button
+                        aria-label={props.intl.formatMessage(messages.undo)}
                         className={
                             classNames(
                                 styles.buttonGroupButton,
@@ -118,6 +119,7 @@ const FixedToolsComponent = props => {
                             )
                         }
                         disabled={undoDisabled}
+                        title={props.intl.formatMessage(messages.undo)}
                         onClick={props.onUndo}
                     >
                         <Undo
@@ -130,6 +132,7 @@ const FixedToolsComponent = props => {
                         />
                     </Button>
                     <Button
+                        aria-label={props.intl.formatMessage(messages.redo)}
                         className={
                             classNames(
                                 styles.buttonGroupButton,
@@ -139,6 +142,7 @@ const FixedToolsComponent = props => {
                             )
                         }
                         disabled={redoDisabled}
+                        title={props.intl.formatMessage(messages.redo)}
                         onClick={props.onRedo}
                     >
                         <Redo
@@ -234,8 +238,52 @@ const FixedToolsComponent = props => {
                                     className={styles.modContextMenu}
                                     rtl={props.rtl}
                                 >
+                                    <MediaQuery maxWidth={600}>
+                                        <React.Fragment>
+                                            <Button
+                                                className={classNames(styles.modMenuItem, {
+                                                    [styles.modDisabled]: !shouldShowGroup()
+                                                })}
+                                                disabled={!shouldShowGroup()}
+                                                onClick={props.onGroup}
+                                            >
+                                                <Group className={styles.menuItemIcon} />
+                                                <span>{props.intl.formatMessage(messages.group)}</span>
+                                            </Button>
+                                            <Button
+                                                className={classNames(styles.modMenuItem, {
+                                                    [styles.modDisabled]: !shouldShowUngroup()
+                                                })}
+                                                disabled={!shouldShowUngroup()}
+                                                onClick={props.onUngroup}
+                                            >
+                                                <Ungroup className={styles.menuItemIcon} />
+                                                <span>{props.intl.formatMessage(messages.ungroup)}</span>
+                                            </Button>
+                                            <Button
+                                                className={classNames(styles.modMenuItem, {
+                                                    [styles.modDisabled]: !shouldShowBringForward()
+                                                })}
+                                                disabled={!shouldShowBringForward()}
+                                                onClick={props.onSendForward}
+                                            >
+                                                <ArrowUp className={styles.menuItemIcon} />
+                                                <span>{props.intl.formatMessage(messages.forward)}</span>
+                                            </Button>
+                                            <Button
+                                                className={classNames(styles.modMenuItem, {
+                                                    [styles.modDisabled]: !shouldShowSendBackward()
+                                                })}
+                                                disabled={!shouldShowSendBackward()}
+                                                onClick={props.onSendBackward}
+                                            >
+                                                <ArrowDown className={styles.menuItemIcon} />
+                                                <span>{props.intl.formatMessage(messages.backward)}</span>
+                                            </Button>
+                                        </React.Fragment>
+                                    </MediaQuery>
                                     <Button
-                                        className={classNames(styles.modMenuItem, {
+                                        className={classNames(styles.modMenuItem, styles.mobileMenuDivider, {
                                             [styles.modDisabled]: !shouldShowBringForward()
                                         })}
                                         disabled={!shouldShowBringForward()}
@@ -277,7 +325,7 @@ const FixedToolsComponent = props => {
                             }
                             tipSize={.01}
                         >
-                            {props.intl.formatMessage(messages.more)}
+                            {props.intl.formatMessage(messages.arrange)}
                         </Dropdown>
                     </InputGroup>
                 </MediaQuery> : null

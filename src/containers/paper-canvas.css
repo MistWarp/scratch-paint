@@ -5,8 +5,8 @@
     height: calc(100% - 2px);
     margin: auto;
     position: absolute;
-    background-color: #D9E3F2;
+    background-color: #EEF2F7;
 }
 [data-paint-theme="dark"] .paper-canvas {
-    background-color: #222;
+    background-color: #191A1D;
 }
