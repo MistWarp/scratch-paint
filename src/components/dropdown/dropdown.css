@@ -35,3 +35,16 @@ $arrow-border-width: 14px;
     padding-bottom: 0;
     padding-top: .2rem;
 }
+
+@media only screen and (max-width: 600px) {
+    .dropdown {
+        min-height: 2.75rem;
+        padding: .65rem .75rem;
+        border-radius: 6px;
+    }
+
+    .dropdown-icon {
+        width: .65rem;
+        height: .65rem;
+    }
+}

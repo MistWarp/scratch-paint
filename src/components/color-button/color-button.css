@@ -76,3 +76,19 @@
     /* Make sure it appears below the transparent icon */
     z-index: 1;
 }
+
+@media only screen and (max-width: 600px) {
+    .color-button {
+        width: 4rem;
+        height: 2.75rem;
+    }
+
+    .color-button-swatch {
+        flex-basis: 2.75rem;
+    }
+
+    .color-button-arrow {
+        flex-basis: 1.25rem;
+        font-size: .9rem;
+    }
+}

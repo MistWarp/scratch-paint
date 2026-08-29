@@ -30,7 +30,7 @@ const createCanvas = function (width, height) {
     const canvas = document.createElement('canvas');
     canvas.width = width ? width : ART_BOARD_WIDTH;
     canvas.height = height ? height : ART_BOARD_HEIGHT;
-    canvas.getContext('2d', { willReadFrequently: true }).imageSmoothingEnabled = false;
+    canvas.getContext('2d', {willReadFrequently: true}).imageSmoothingEnabled = false;
     return canvas;
 };
 
@@ -40,7 +40,7 @@ const clearRaster = function () {
     
     // Generate blank raster
     const raster = new paper.Raster(createCanvas());
-    raster.canvas.getContext('2d', { willReadFrequently: true }).imageSmoothingEnabled = false;
+    raster.canvas.getContext('2d', {willReadFrequently: true}).imageSmoothingEnabled = false;
     raster.parent = layer;
     raster.guide = true;
     raster.locked = true;
@@ -180,10 +180,10 @@ const _makeRasterLayer = function () {
     return rasterLayer;
 };
 
-const BACKGROUND_LIGHT = '#FFFFFF';
-const BACKGROUND_TILE_LIGHT = '#D9E3F2';
-const BACKGROUND_DARK = '#111';
-const BACKGROUND_TILE_DARK = '#222';
+const BACKGROUND_LIGHT = '#F7F9FC';
+const BACKGROUND_TILE_LIGHT = '#E9EEF5';
+const BACKGROUND_DARK = '#202124';
+const BACKGROUND_TILE_DARK = '#292B30';
 
 const _makeBackgroundPaper = function (width, height, opacity) {
     // creates a checkerboard path of width * height squares in color on white
@@ -283,7 +283,7 @@ const _makeDragCrosshairLayer = function () {
 };
 
 const OUTLINE_INNER_LIGHT = '#FFFFFF';
-const OUTLINE_OUTER_LIGHT = '#4280D7';
+const OUTLINE_OUTER_LIGHT = '#6D9EE8';
 const OUTLINE_INNER_DARK = '#555555';
 
 const _makeOutlineLayer = function () {
@@ -295,14 +295,14 @@ const _makeOutlineLayer = function () {
     const blueRect = new paper.Shape.Rectangle(ART_BOARD_BOUNDS.expand(5));
     blueRect.strokeWidth = 2;
     blueRect.strokeColor = OUTLINE_OUTER_LIGHT;
-    blueRect.opacity = 0.25;
+    blueRect.opacity = 0.55;
     setGuideItem(blueRect);
     outlineLayer.data.isOutlineLayer = true;
     return outlineLayer;
 };
 
-const WORKSPACE_BOUNDS_LIGHT = '#ECF1F9';
-const WORKSPACE_BOUNDS_DARK = '#333';
+const WORKSPACE_BOUNDS_LIGHT = '#EEF2F7';
+const WORKSPACE_BOUNDS_DARK = '#191A1D';
 
 const _makeBackgroundGuideLayer = function (format) {
     const guideLayer = new paper.Layer();
@@ -317,7 +317,7 @@ const _makeBackgroundGuideLayer = function (format) {
     const vBackground = _makeBackgroundPaper(
         MAX_WORKSPACE_BOUNDS.width / CHECKERBOARD_SIZE,
         (MAX_WORKSPACE_BOUNDS.height / CHECKERBOARD_SIZE) + 1,
-        0.55);
+        0.42);
     vBackground.position = CENTER;
     vBackground.scaling = new paper.Point(CHECKERBOARD_SIZE, CHECKERBOARD_SIZE);
 
@@ -330,7 +330,7 @@ const _makeBackgroundGuideLayer = function (format) {
     const bitmapBackground = _makeBackgroundPaper(
         ART_BOARD_WIDTH / CHECKERBOARD_SIZE,
         ART_BOARD_HEIGHT / CHECKERBOARD_SIZE,
-        0.55);
+        0.42);
     bitmapBackground.position = CENTER;
     bitmapBackground.scaling = new paper.Point(CHECKERBOARD_SIZE, CHECKERBOARD_SIZE);
     bitmapBackground.guide = true;

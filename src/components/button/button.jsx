@@ -26,6 +26,7 @@ const ButtonComponent = ({
     }
     return (
         <span
+            aria-disabled={disabled || null}
             className={classNames(
                 styles.button,
                 className,
@@ -35,6 +36,7 @@ const ButtonComponent = ({
                 }
             )}
             role="button"
+            tabIndex={disabled ? -1 : 0}
             {...props}
         >
             {children}
