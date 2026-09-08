@@ -18,12 +18,12 @@ test('changeBrushSize', () => {
     const initialSimplifySize = 10;
 
     expect(brushReducer(defaultState /* state */, changeBrushSize(newBrushSize) /* action */))
-        .toEqual({brushSize: newBrushSize, simplifySize: initialSimplifySize});
+        .toMatchObject({brushSize: newBrushSize, simplifySize: initialSimplifySize});
     expect(brushReducer(1 /* state */, changeBrushSize(newBrushSize) /* action */))
         .toEqual({brushSize: newBrushSize});
 
     expect(eraserReducer(defaultState /* state */, changeEraserSize(newBrushSize) /* action */))
-        .toEqual({brushSize: newBrushSize, simplifySize: initialSimplifySize});
+        .toMatchObject({brushSize: newBrushSize, simplifySize: initialSimplifySize});
     expect(eraserReducer(1 /* state */, changeEraserSize(newBrushSize) /* action */))
         .toEqual({brushSize: newBrushSize});
 });

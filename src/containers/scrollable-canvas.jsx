@@ -38,14 +38,26 @@ class ScrollableCanvas extends React.Component {
         }
     }
     componentWillReceiveProps (nextProps) {
-        if (nextProps.canvas) {
+        if (nextProps.canvas !== this.props.canvas) {
             if (this.props.canvas) {
                 this.props.canvas.removeEventListener('wheel', this.handleWheel);
                 this.props.canvas.removeEventListener('mousedown', this.handleMouseDown);
             }
-            nextProps.canvas.addEventListener('wheel', this.handleWheel);
-            nextProps.canvas.addEventListener('mousedown', this.handleMouseDown);
+            if (nextProps.canvas) {
+                nextProps.canvas.addEventListener('wheel', this.handleWheel);
+                nextProps.canvas.addEventListener('mousedown', this.handleMouseDown);
+            }
         }
+    }
+    componentWillUnmount () {
+        if (this.props.canvas) {
+            this.props.canvas.removeEventListener('wheel', this.handleWheel);
+            this.props.canvas.removeEventListener('mousedown', this.handleMouseDown);
+        }
+        const event = {preventDefault: () => {}};
+        this.handleDragEnd(event);
+        this.handleHorizontalScrollbarMouseUp(event);
+        this.handleVerticalScrollbarMouseUp(event);
     }
     handleMouseDown (event) {
         if (event.button === 1) {
@@ -96,7 +108,7 @@ class ScrollableCanvas extends React.Component {
         this.props.updateViewBounds(paper.view.matrix);
         event.preventDefault();
     }
-    handleHorizontalScrollbarMouseUp () {
+    handleHorizontalScrollbarMouseUp (event) {
         window.removeEventListener('mousemove', this.handleHorizontalScrollbarMouseMove);
         window.removeEventListener('touchmove', this.handleHorizontalScrollbarMouseMove, {passive: false});
         window.removeEventListener('mouseup', this.handleHorizontalScrollbarMouseUp);

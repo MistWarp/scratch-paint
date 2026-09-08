@@ -39,9 +39,6 @@ $scrollbar-padding: 4px;
     padding-bottom: $scrollbar-padding;
 }
 
-@media only screen and (max-width: 600px) {
-    .vertical-scrollbar-wrapper,
-    .horizontal-scrollbar-wrapper {
-        display: none;
-    }
+.vertical-scrollbar-hitbox, .horizontal-scrollbar-hitbox {
+    touch-action: none;
 }

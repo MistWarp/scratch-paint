@@ -1,4 +1,5 @@
 .paper-canvas {
+    touch-action: none;
     top: 1px; /* leave room for the border */
     left: 1px;
     width: calc(100% - 2px);

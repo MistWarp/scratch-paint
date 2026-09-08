@@ -1,4 +1,5 @@
 import paper from '@turbowarp/paper';
+import log from '../log/log';
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
@@ -351,39 +352,43 @@ class ModeTools extends React.Component {
             return;
         }
 
-        // Convert possible text items to paths
-        for (let i = 0; i < selectedItems.length; i++) {
-            if (selectedItems[i].className === "PointText") {
-                const path = await this.convertText2Path(selectedItems[i]);
-                if (path) selectedItems[i] = path;
-            }
-        }
-
-        let topItem = selectedItems[0];
-        if (topItem.className !== "PointText" && !topItem.unite) {
-            // we cant unite this item, cancel
-            return;
-        }
-
-        if (typeof operation !== "string") operation = "unite";
-
-        // unite the shapes together, creating a clone on top of the original
-        let oldTopItem;
-        for (let i = 1; i < selectedItems.length; i++) {
-            topItem = topItem[operation](selectedItems[i]);
-            if (oldTopItem) oldTopItem.remove();
-            oldTopItem = topItem;
-        }
-
-        // if shift is pressed, remove the old items
-        if (event.shiftKey) {
+        const project = paper.project;
+        const keepOriginals = Boolean(event && event.shiftKey);
+        const operands = [];
+        const temporary = [];
+        let result = null;
+        let committed = false;
+        try {
             for (const item of selectedItems) {
-                item.remove();
+                const operand = item.className === 'PointText' ? await this.convertText2Path(item) : item;
+                if (operand !== item && operand) temporary.push(operand);
+                if (!operand || typeof operand.unite !== 'function' || paper.project !== project || !item.isInserted()) {
+                    return;
+                }
+                operands.push(operand);
+            }
+            if (selectedItems.some(item => !item.isInserted())) return;
+            if (!['unite', 'intersect', 'subtract', 'exclude'].includes(operation)) operation = 'unite';
+            result = operands[0];
+            for (let i = 1; i < operands.length; i++) {
+                result = result[operation](operands[i]);
+                if (!result) return;
+                temporary.push(result);
+            }
+            for (const item of selectedItems) {
+                setItemSelection(item, false);
+                if (!keepOriginals) item.remove();
+            }
+            setItemSelection(result, true);
+            committed = true;
+            this.props.onUpdateImage();
+        } catch (error) {
+            log.warn('Could not combine the selected shapes:', error);
+        } finally {
+            for (const item of temporary) {
+                if (!committed || item !== result) item.remove();
             }
         }
-
-        setItemSelection(topItem, true);
-        this.props.onUpdateImage();
     }
 
     handleMaskShape (event) {
