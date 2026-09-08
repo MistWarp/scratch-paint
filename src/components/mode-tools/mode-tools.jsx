@@ -614,7 +614,7 @@ const ModeToolsComponent = props => {
     case Modes.BIT_SELECT:
         /* falls through */
     case Modes.SELECT:
-        const reshapingMethods = props.format.startsWith('BITMAP') ? null : (
+        const reshapingMethods = isBitmap(props.format) ? null : (
             <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
                 <LabeledIconButton
                     hideLabel={hideLabel(props.intl.locale)}
@@ -732,7 +732,7 @@ const ModeToolsComponent = props => {
                                         <Plus className={styles.menuItemIcon} />
                                         <span>{props.intl.formatMessage(messages.movementCenter)}</span>
                                     </Button>
-                                    {props.mode === Modes.SELECT && !props.format.startsWith('BITMAP') ? (
+                                    {props.mode === Modes.SELECT && !isBitmap(props.format) ? (
                                         <React.Fragment>
                                             <Button
                                                 className={classNames(styles.modMenuItem, styles.modTopDivider)}

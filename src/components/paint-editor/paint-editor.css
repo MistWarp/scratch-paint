@@ -209,6 +209,14 @@ $border-radius: 0.25rem;
     margin-left: calc(2 * $grid-unit);
 }
 
+.tool-strip-panel {
+    display: contents;
+}
+
+.tool-strip-scroll-button {
+    display: none;
+}
+
 @media only screen and (max-width: $full-size-paint) {
     .editor-container {
         padding: calc(3 * $grid-unit) $grid-unit;
@@ -389,9 +397,6 @@ $border-radius: 0.25rem;
         flex: 0 0 auto;
     }
 
-    .button-group-button.zoom-step-button {
-        display: none;
-    }
 
     .button-text {
         overflow: hidden;

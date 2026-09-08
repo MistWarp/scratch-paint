@@ -77,39 +77,30 @@ const ResponsiveToolStrip = props => {
         }
     };
     return (
-        <React.Fragment>
-            <MediaQuery minWidth={601}>
-                <div className={classNames(styles.modeSelector, props.modeSelectorClassName)}>
-                    {props.children}
-                </div>
-            </MediaQuery>
-            <MediaQuery maxWidth={600}>
-                <div className={styles.toolStripPanel}>
-                    <Button
-                        aria-label="Previous paint tools"
-                        className={styles.toolStripScrollButton}
-                        title="Previous paint tools"
-                        onClick={() => scrollTools(-240)} // eslint-disable-line react/jsx-no-bind
-                    >
-                        <ChevronLeft />
-                    </Button>
-                    <div
-                        className={classNames(styles.modeSelector, props.modeSelectorClassName)}
-                        ref={toolStrip}
-                    >
-                        {props.children}
-                    </div>
-                    <Button
-                        aria-label="More paint tools"
-                        className={styles.toolStripScrollButton}
-                        title="More paint tools"
-                        onClick={() => scrollTools(240)} // eslint-disable-line react/jsx-no-bind
-                    >
-                        <ChevronRight />
-                    </Button>
-                </div>
-            </MediaQuery>
-        </React.Fragment>
+        <div className={styles.toolStripPanel}>
+            <Button
+                aria-label="Previous paint tools"
+                className={styles.toolStripScrollButton}
+                title="Previous paint tools"
+                onClick={() => scrollTools(-240)} // eslint-disable-line react/jsx-no-bind
+            >
+                <ChevronLeft />
+            </Button>
+            <div
+                className={classNames(styles.modeSelector, props.modeSelectorClassName)}
+                ref={toolStrip}
+            >
+                {props.children}
+            </div>
+            <Button
+                aria-label="More paint tools"
+                className={styles.toolStripScrollButton}
+                title="More paint tools"
+                onClick={() => scrollTools(240)} // eslint-disable-line react/jsx-no-bind
+            >
+                <ChevronRight />
+            </Button>
+        </div>
     );
 };
 

@@ -323,9 +323,6 @@ class PaperCanvas extends React.Component {
         clampViewBounds();
         // Fix incorrect paper canvas scale on browser zoom reset
         this.recalibrateSize(() => {
-            if (window.matchMedia('(max-width: 600px)').matches) {
-                zoomToFit(isBitmap(this.props.format), true);
-            }
             this.props.updateViewBounds(paper.view.matrix);
         });
     }

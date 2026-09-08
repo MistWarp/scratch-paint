@@ -19,7 +19,7 @@ const base = {
             loader: 'babel-loader',
             include: path.resolve(__dirname, 'src'),
             options: {
-                plugins: ['transform-object-rest-spread'],
+                babelrc: false,
                 presets: ['@babel/preset-env', '@babel/preset-react']
             }
         },

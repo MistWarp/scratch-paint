@@ -146,7 +146,7 @@ const FixedToolsComponent = props => {
                         onClick={props.onRedo}
                     >
                         <Redo
-                            alt={props.intl.formatMessage(messages.undo)}
+                            alt={props.intl.formatMessage(messages.redo)}
                             className={classNames(
                                 styles.buttonGroupButtonIcon,
                                 styles.undoIcon

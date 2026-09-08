@@ -141,23 +141,23 @@ const showGuideLayers = function (guideLayers) {
     const outlineLayer = guideLayers.outlineLayer;
     const guideLayer = guideLayers.guideLayer;
     const rasterLayer = guideLayers.rasterLayer;
-    if (rasterLayer && !rasterLayer.index) {
+    if (rasterLayer && rasterLayer.index == null) {
         paper.project.addLayer(rasterLayer);
         rasterLayer.sendToBack();
     }
-    if (!backgroundGuideLayer.index) {
+    if (backgroundGuideLayer.index == null) {
         paper.project.addLayer(backgroundGuideLayer);
         backgroundGuideLayer.sendToBack();
     }
-    if (!dragCrosshairLayer.index) {
+    if (dragCrosshairLayer.index == null) {
         paper.project.addLayer(dragCrosshairLayer);
         dragCrosshairLayer.bringToFront();
     }
-    if (!outlineLayer.index) {
+    if (outlineLayer.index == null) {
         paper.project.addLayer(outlineLayer);
         outlineLayer.bringToFront();
     }
-    if (!guideLayer.index) {
+    if (guideLayer.index == null) {
         paper.project.addLayer(guideLayer);
         guideLayer.bringToFront();
     }
