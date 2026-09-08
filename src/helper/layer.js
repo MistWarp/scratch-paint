@@ -207,13 +207,13 @@ const _makeBackgroundPaper = function (width, height, opacity) {
     const vRect = new paper.Shape.Rectangle(
         new paper.Point(0, 0),
         new paper.Point(ART_BOARD_WIDTH / CHECKERBOARD_SIZE, ART_BOARD_HEIGHT / CHECKERBOARD_SIZE));
-    vRect.fillColor = BACKGROUND_LIGHT;
+    vRect.fillColor = new paper.Color(BACKGROUND_LIGHT);
     vRect.guide = true;
     vRect.locked = true;
     vRect.position = CENTER;
     const vPath = new paper.Path(pathPoints);
     vPath.fillRule = 'evenodd';
-    vPath.fillColor = BACKGROUND_TILE_LIGHT;
+    vPath.fillColor = new paper.Color(BACKGROUND_TILE_LIGHT);
     vPath.opacity = opacity;
     vPath.guide = true;
     vPath.locked = true;
@@ -290,7 +290,7 @@ const _makeOutlineLayer = function () {
     const outlineLayer = new paper.Layer();
     const whiteRect = new paper.Shape.Rectangle(ART_BOARD_BOUNDS.expand(1));
     whiteRect.strokeWidth = 2;
-    whiteRect.strokeColor = OUTLINE_INNER_LIGHT;
+    whiteRect.strokeColor = new paper.Color(OUTLINE_INNER_LIGHT);
     setGuideItem(whiteRect);
     const blueRect = new paper.Shape.Rectangle(ART_BOARD_BOUNDS.expand(5));
     blueRect.strokeWidth = 2;
@@ -309,7 +309,7 @@ const _makeBackgroundGuideLayer = function (format) {
     guideLayer.locked = true;
     
     const vWorkspaceBounds = new paper.Shape.Rectangle(MAX_WORKSPACE_BOUNDS);
-    vWorkspaceBounds.fillColor = WORKSPACE_BOUNDS_LIGHT;
+    vWorkspaceBounds.fillColor = new paper.Color(WORKSPACE_BOUNDS_LIGHT);
     vWorkspaceBounds.position = CENTER;
 
     // Add 1 to the height because it's an odd number otherwise, and we want it to be even
@@ -348,18 +348,20 @@ const _makeBackgroundGuideLayer = function (format) {
 const updateTheme = function (theme) {
     const isDark = theme === 'dark';
 
+    // These styles can change before Paper draws or reads them. Store Color
+    // objects so its setter can invalidate the previous colour's canvas cache.
     const backgroundGuideLayer = getBackgroundGuideLayer();
     const bitmapChildren = backgroundGuideLayer.bitmapBackground.children;
-    bitmapChildren[0].fillColor = isDark ? BACKGROUND_DARK : BACKGROUND_LIGHT;
-    bitmapChildren[1].fillColor = isDark ? BACKGROUND_TILE_DARK : BACKGROUND_TILE_LIGHT;
+    bitmapChildren[0].fillColor = new paper.Color(isDark ? BACKGROUND_DARK : BACKGROUND_LIGHT);
+    bitmapChildren[1].fillColor = new paper.Color(isDark ? BACKGROUND_TILE_DARK : BACKGROUND_TILE_LIGHT);
 
     const vectorChildren = backgroundGuideLayer.vectorBackground.children;
-    vectorChildren[0].fillColor = isDark ? WORKSPACE_BOUNDS_DARK : WORKSPACE_BOUNDS_LIGHT;
-    vectorChildren[1].children[0].fillColor = isDark ? BACKGROUND_DARK : BACKGROUND_LIGHT;
-    vectorChildren[1].children[1].fillColor = isDark ? BACKGROUND_TILE_DARK : BACKGROUND_TILE_LIGHT;
+    vectorChildren[0].fillColor = new paper.Color(isDark ? WORKSPACE_BOUNDS_DARK : WORKSPACE_BOUNDS_LIGHT);
+    vectorChildren[1].children[0].fillColor = new paper.Color(isDark ? BACKGROUND_DARK : BACKGROUND_LIGHT);
+    vectorChildren[1].children[1].fillColor = new paper.Color(isDark ? BACKGROUND_TILE_DARK : BACKGROUND_TILE_LIGHT);
 
     const outlineLayer = getOutlineLayer();
-    outlineLayer.children[0].strokeColor = isDark ? OUTLINE_INNER_DARK : OUTLINE_INNER_LIGHT;
+    outlineLayer.children[0].strokeColor = new paper.Color(isDark ? OUTLINE_INNER_DARK : OUTLINE_INNER_LIGHT);
 };
 
 const setupLayers = function (format) {
