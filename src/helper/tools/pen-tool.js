@@ -103,6 +103,7 @@ class PenTool extends paper.Tool {
     }
     handleMouseDrag (event) {
         if (event.event.button > 0) return; // only first mouse button
+        if (!this.path || !this.subpath) return;
         
         // If near another path's endpoint, or this path's beginpoint, highlight it to suggest
         // joining/closing the paths.
@@ -132,6 +133,7 @@ class PenTool extends paper.Tool {
     }
     handleMouseUp (event) {
         if (event.event.button > 0) return; // only first mouse button
+        if (!this.path || !this.subpath) return;
         
         // If I single clicked, don't do anything
         if (!this.hitResult && // Might be connecting 2 points that are very close

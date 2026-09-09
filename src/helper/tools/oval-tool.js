@@ -94,6 +94,7 @@ class OvalTool extends paper.Tool {
             this.boundingBoxTool.onMouseDrag(event);
             return;
         }
+        if (!this.oval) return;
 
         const downPoint = new paper.Point(event.downPoint.x, event.downPoint.y);
         const point = new paper.Point(event.point.x, event.point.y);
@@ -119,6 +120,7 @@ class OvalTool extends paper.Tool {
     }
     handleMouseUp (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
+        this.active = false;
 
         if (this.isBoundingBoxMode) {
             this.boundingBoxTool.onMouseUp(event);

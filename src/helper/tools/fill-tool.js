@@ -175,7 +175,7 @@ class FillTool extends paper.Tool {
                 let parent = this.fillItem.parent;
                 this.fillItem.remove();
                 parent = parent.reduce();
-                parent.fillColor = this.fillColor;
+                parent.fillColor = this.fillColor === null ? null : new paper.Color(this.fillColor);
             } else if (this.addedFillItem) {
                 // Fill in a hole.
                 this.addedFillItem.data.noHover = false;
@@ -222,7 +222,9 @@ class FillTool extends paper.Tool {
                 item.strokeWidth
             );
         } else {
-            item[colorProp] = color1;
+            // Paper stores assigned strings lazily. A second assignment before a
+            // read tries to invalidate a color cache on that string.
+            item[colorProp] = typeof color1 === 'string' ? new paper.Color(color1) : color1;
         }
     }
     _getFillItem () {
