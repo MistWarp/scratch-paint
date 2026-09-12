@@ -611,6 +611,10 @@ const stylePath = function (path, strokeColor, strokeWidth) {
 };
 
 const styleCursorPreview = function (path, options) {
+    // Paper lazily converts stored strings to Colors. Materialize them before
+    // replacing a color again, which can happen before the next canvas draw.
+    path.getFillColor();
+    path.getStrokeColor();
     if (options.isEraser) {
         path.fillColor = 'white';
         path.strokeColor = 'cornflowerblue';
