@@ -2,11 +2,22 @@ import paper from '@turbowarp/paper';
 import FillTool from '../../src/helper/tools/fill-tool';
 import PenTool from '../../src/helper/tools/pen-tool';
 import OvalTool from '../../src/helper/tools/oval-tool';
+import {styleCursorPreview} from '../../src/helper/style-path';
 import GradientTypes from '../../src/lib/gradient-types';
 
 describe('paint tool lifecycle', () => {
     beforeEach(() => paper.setup(document.createElement('canvas')));
     afterEach(() => paper.project.remove());
+
+    test('changes cursor colors repeatedly before Paper draws', () => {
+        const path = new paper.Path.Circle(new paper.Point(20, 20), 10);
+        styleCursorPreview(path, {fillColor: 'rgb(0,0,0)'});
+        styleCursorPreview(path, {fillColor: '#9966ff'});
+        styleCursorPreview(path, {isEraser: true});
+        styleCursorPreview(path, {isEraser: true});
+        styleCursorPreview(path, {fillColor: '#ffffff'});
+        expect(path.fillColor.toCSS(true)).toBe('#ffffff');
+    });
 
     test('restores fill preview before Paper has drawn the preview color', () => {
         const item = new paper.Path.Circle(new paper.Point(20, 20), 10);
