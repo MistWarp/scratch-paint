@@ -69,10 +69,12 @@ const selectItemSegments = function (item, state) {
                 child.fullySelected = state;
             }
         }
-    } else {
+    } else if (item.segments) {
         for (let i = 0; i < item.segments.length; i++) {
             item.segments[i].selected = state;
         }
+    } else {
+        item.selected = state;
     }
 };
 
