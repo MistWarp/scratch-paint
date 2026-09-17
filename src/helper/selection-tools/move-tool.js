@@ -122,6 +122,9 @@ class MoveTool {
         this.setSelectedItems();
     }
     onMouseDrag (event) {
+        if (!this.selectedItems || this.selectedItems.length === 0) {
+            return;
+        }
         const point = event.point;
         const actionBounds = getActionBounds(this.mode in BitmapModes);
 
@@ -140,9 +143,6 @@ class MoveTool {
 
                 snapVector = CENTER.subtract(this.selectionCenter);
             }
-        }
-        if (this.selectedItems.length === 0) {
-            return;
         }
 
         let bounds;
