@@ -152,7 +152,7 @@ class LineMode extends React.Component {
         this.drawHitPoint(this.hitResult);
     }
     onMouseDrag (event) {
-        if (event.event.button > 0 || !this.active) return; // only first mouse button
+        if (event.event.button > 0 || !this.active || !this.path) return; // only first mouse button
 
         // Clear the last hit result
         if (this.hitResult) {
@@ -208,6 +208,9 @@ class LineMode extends React.Component {
     }
     onMouseUp (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
+        // End the gesture before any short-line return or image update callback.
+        this.active = false;
+        if (!this.path) return;
 
         // If I single clicked, don't do anything
         if (this.path.segments.length < 2 ||
@@ -257,6 +260,7 @@ class LineMode extends React.Component {
         this.active = false;
     }
     deactivateTool () {
+        this.active = false;
         this.tool.remove();
         this.tool = null;
         if (this.hitResult) {
@@ -318,3 +322,5 @@ export default connect(
     mapStateToProps,
     mapDispatchToProps
 )(LineMode);
+
+export {LineMode};
