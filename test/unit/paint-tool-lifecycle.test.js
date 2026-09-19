@@ -4,6 +4,7 @@ import PenTool from '../../src/helper/tools/pen-tool';
 import OvalTool from '../../src/helper/tools/oval-tool';
 import {styleCursorPreview} from '../../src/helper/style-path';
 import GradientTypes from '../../src/lib/gradient-types';
+import {LineMode} from '../../src/containers/line-mode.jsx';
 
 describe('paint tool lifecycle', () => {
     beforeEach(() => paper.setup(document.createElement('canvas')));
@@ -49,5 +50,42 @@ describe('paint tool lifecycle', () => {
         tool.handleMouseUp(event);
         expect(tool.active).toBe(false);
         expect(() => tool.handleMouseDrag(event)).not.toThrow();
+    });
+
+    const lineEvent = (x, y) => ({
+        event: {button: 0}, modifiers: {shift: false}, point: new paper.Point(x, y)
+    });
+    const makeLineMode = () => new LineMode({
+        colorState: {strokeColor: {primary: '#000000', secondary: null, gradientType: GradientTypes.SOLID},
+            strokeWidth: 1},
+        onUpdateImage: jest.fn()
+    });
+
+    test('a cancelled short line ignores late events and can start a new line', () => {
+        const mode = makeLineMode();
+        mode.onMouseDown(lineEvent(20, 20));
+        mode.onMouseUp(lineEvent(20, 20));
+        expect(mode.path).toBeNull();
+        expect(mode.active).toBe(false);
+        expect(() => mode.onMouseDrag(lineEvent(30, 30))).not.toThrow();
+        expect(() => mode.onMouseUp(lineEvent(30, 30))).not.toThrow();
+        expect(mode.props.onUpdateImage).not.toHaveBeenCalled();
+
+        mode.onMouseDown(lineEvent(20, 20));
+        mode.onMouseDrag(lineEvent(60, 60));
+        mode.onMouseUp(lineEvent(60, 60));
+        expect(mode.props.onUpdateImage).toHaveBeenCalledTimes(1);
+    });
+
+    test('a short extension preserves the existing line and ends its gesture', () => {
+        const path = new paper.Path([new paper.Point(20, 20), new paper.Point(60, 60)]);
+        const mode = makeLineMode();
+        mode.onMouseDown(lineEvent(60, 60));
+        mode.onMouseDrag(lineEvent(61, 61));
+        mode.onMouseUp(lineEvent(61, 61));
+        expect(path.segments).toHaveLength(2);
+        expect(mode.active).toBe(false);
+        expect(() => mode.onMouseDrag(lineEvent(80, 80))).not.toThrow();
+        expect(mode.props.onUpdateImage).not.toHaveBeenCalled();
     });
 });
