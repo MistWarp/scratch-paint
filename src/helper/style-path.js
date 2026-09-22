@@ -413,6 +413,11 @@ const _colorStateFromGradient = gradient => {
     return colorState;
 };
 
+const _isVerticalGradient = function (color) {
+    if (!color || color.type !== 'gradient' || !color.origin || !color.destination) return false;
+    return Math.abs(color.destination.subtract(color.origin).angle) === 90;
+};
+
 /**
  * Get state of colors and stroke width for selection
  * @param {!Array<paper.Item>} selectedItems Selected paper items
@@ -433,6 +438,7 @@ const getColorsFromSelection = function (selectedItems, bitmapMode) {
     let selectionFillGradientType;
     let selectionStrokeGradientType;
     let firstChild = true;
+    let firstItem = null;
 
     for (let item of selectedItems) {
         if (item.parent instanceof paper.CompoundPath) {
@@ -497,6 +503,8 @@ const getColorsFromSelection = function (selectedItems, bitmapMode) {
                     // Stroke color is fill color in bitmap
                     if (bitmapMode) {
                         itemFillColorString = strokeColorString;
+                        itemFillColor2String = null;
+                        itemFillGradientType = GradientTypes.SOLID;
                     } else {
                         itemStrokeColorString = strokeColorString;
                     }
@@ -508,6 +516,7 @@ const getColorsFromSelection = function (selectedItems, bitmapMode) {
             // check every style against the first of the items
             if (firstChild) {
                 firstChild = false;
+                firstItem = item;
                 selectionFillColorString = itemFillColorString;
                 selectionFillColor2String = itemFillColor2String;
                 selectionStrokeColorString = itemStrokeColorString;
@@ -551,25 +560,13 @@ const getColorsFromSelection = function (selectedItems, bitmapMode) {
     // This is because up to this point, we assume all non-radial gradients are horizontal
     // Otherwise, if there were a mix of horizontal/vertical gradient types in the selection, they would show as MIXED
     // whereas we want them to show as horizontal (or vertical if the first item is vertical)
-    if (selectedItems && selectedItems.length) {
-        let firstItem = selectedItems[0];
-        if (firstItem.parent instanceof paper.CompoundPath) firstItem = firstItem.parent;
-
-        if (selectionFillGradientType !== GradientTypes.SOLID) {
-            // Stroke color is fill color in bitmap if fill color is missing
-            // TODO: this whole "treat horizontal/vertical gradients specially" logic is janky; refactor at some point
-            const firstItemColor = (bitmapMode && firstItem.strokeColor) ? firstItem.strokeColor : firstItem.fillColor;
-            const direction = firstItemColor.destination.subtract(firstItemColor.origin);
-            if (Math.abs(direction.angle) === 90) {
-                selectionFillGradientType = GradientTypes.VERTICAL;
-            }
+    if (firstItem) {
+        const firstFillColor = (bitmapMode && firstItem.strokeColor) ? firstItem.strokeColor : firstItem.fillColor;
+        if (selectionFillGradientType !== GradientTypes.SOLID && _isVerticalGradient(firstFillColor)) {
+            selectionFillGradientType = GradientTypes.VERTICAL;
         }
-
-        if (selectionStrokeGradientType !== GradientTypes.SOLID) {
-            const direction = firstItem.strokeColor.destination.subtract(firstItem.strokeColor.origin);
-            if (Math.abs(direction.angle) === 90) {
-                selectionStrokeGradientType = GradientTypes.VERTICAL;
-            }
+        if (selectionStrokeGradientType !== GradientTypes.SOLID && _isVerticalGradient(firstItem.strokeColor)) {
+            selectionStrokeGradientType = GradientTypes.VERTICAL;
         }
     }
     if (bitmapMode) {
