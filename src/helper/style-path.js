@@ -629,7 +629,10 @@ const styleShape = function (path, options) {
         if (options[colorKey] === null) {
             path[colorKey] = null;
         } else if (options[colorKey].gradientType === GradientTypes.SOLID) {
-            path[colorKey] = options[colorKey].primary;
+            // Assign a Color instance rather than a CSS string. paper.js stores the raw value until
+            // it is first read, and replacing an unread string throws when it tries to clear the
+            // old value's canvas style. Bitmap shapes restyle on every color change before any read.
+            path[colorKey] = new paper.Color(options[colorKey].primary);
         } else {
             const {primary, secondary, gradientType} = options[colorKey];
             path[colorKey] = createGradientObject(
