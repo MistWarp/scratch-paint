@@ -61,6 +61,8 @@ class BroadBrushHelper {
     }
 
     onBroadMouseDrag (event, tool, options) {
+        // A late drag can arrive after a stroke has resolved into a CompoundPath.
+        if (!this.finalPath || !this.lastPoint || (!this.isSquareBrush && !(this.finalPath instanceof paper.Path))) return;
         let delta = event.delta;
         if (event.modifiers.shift) {
             // 45 degree movement
