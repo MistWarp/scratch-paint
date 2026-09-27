@@ -245,6 +245,8 @@ class BroadBrushHelper {
     }
 
     onBroadMouseUp (event, tool, options) {
+        // A completed stroke may be a CompoundPath after resolving crossings.
+        if (this.finalPath && !(this.finalPath instanceof paper.Path)) return this.finalPath;
         // If there was only a single click, draw a circle.
         if (this.steps === 0) {
             this.endCaps.length = 0;
