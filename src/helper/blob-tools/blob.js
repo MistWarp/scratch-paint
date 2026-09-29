@@ -322,6 +322,7 @@ class Blobbiness {
                 // keep first and last segments
                 for (let j = intersections.length - 1; j >= 0; j--) {
                     const split = firstSeg.splitAt(intersections[j]);
+                    if (!split) continue;
                     split.insertAbove(firstSeg);
                     subpaths.push(split);
                 }
