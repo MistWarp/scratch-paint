@@ -1,3 +1,4 @@
+import './lib/paper-color-setters';
 import PaintEditor from './containers/tw-paint-editor-wrapper.jsx';
 import ScratchPaintReducer from './reducers/scratch-paint-reducer';
 
