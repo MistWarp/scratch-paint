@@ -1,6 +1,7 @@
 /* eslint-env jest */
 import paper from '@turbowarp/paper';
-import {styleShape} from '../../src/helper/style-path';
+import '../../src/lib/paper-color-setters';
+import {applyColorToSelection, styleShape} from '../../src/helper/style-path';
 import GradientTypes from '../../src/lib/gradient-types';
 
 const solid = primary => ({primary, secondary: null, gradientType: GradientTypes.SOLID});
@@ -17,4 +18,24 @@ test('styleShape stores solid colors as Color instances so paper can clear their
     expect(shape.strokeColor.toCSS(true)).toBe('#000000');
     expect(shape.fillColor.toCSS(true)).toBe('#ff0000');
     expect(shape.strokeWidth).toBe(2);
+});
+
+test('recoloring a selected bitmap rectangle never hands paper an unread color string to clear', () => {
+    paper.setup(new paper.Size(480, 360));
+    const rect = new paper.Shape.Rectangle({point: [0, 0], size: [10, 10]});
+    styleShape(rect, {fillColor: solid('#9966ff'), strokeColor: null, strokeWidth: 0});
+    rect.selected = true;
+    const setOwner = jest.spyOn(paper.Color, '_setOwner');
+
+    expect(applyColorToSelection('#9fc9ff', 0, true, false)).toBe(true);
+    styleShape(rect, {fillColor: solid('#00ff00'), strokeColor: null, strokeWidth: 0});
+    rect.strokeColor = '#ff0000';
+    rect.strokeColor = '#0000ff';
+
+    const clearedColors = setOwner.mock.calls.filter(([, owner]) => owner === null).map(([color]) => color);
+    setOwner.mockRestore();
+    expect(clearedColors.length).toBeGreaterThan(0);
+    for (const color of clearedColors) expect(color).toBeInstanceOf(paper.Color);
+    expect(rect.fillColor.toCSS(true)).toBe('#00ff00');
+    expect(rect.strokeColor.toCSS(true)).toBe('#0000ff');
 });
