@@ -237,7 +237,7 @@ const drawShearedEllipse_ = function (options, context) {
  * @return {HTMLCanvasElement} a canvas with the brush mark printed on it
  */
 const getBrushMark = function (size, color, isEraser) {
-    size = ~~size;
+    size = Math.max(1, ~~size);
     const canvas = document.createElement('canvas');
     const roundedUpRadius = Math.ceil(size / 2);
     canvas.width = roundedUpRadius * 2;
