@@ -22,6 +22,7 @@ import {changeFormat} from '../reducers/format';
 import {updateViewBounds} from '../reducers/view-bounds';
 import {saveZoomLevel, setZoomLevelId} from '../reducers/zoom-levels';
 import {setImportingImage} from '../lib/tw-is-importing-image';
+import fixSvgGradients from '../lib/fix-svg-gradients';
 
 import styles from './paper-canvas.css';
 
@@ -230,17 +231,27 @@ class PaperCanvas extends React.Component {
                 viewBox[i] = parseFloat(viewBox[i]);
             }
         }
+        const source = fixSvgGradients(svgDom) ? svgDom : svg;
 
-        paper.project.importSVG(svg, {
+        const {applyMatrix, insertItems} = paper.settings;
+        const onImportFailed = function (error) {
+            paper.settings.applyMatrix = applyMatrix;
+            paper.settings.insertItems = insertItems;
+            log.error('SVG import failed:', error);
+            log.info(svg);
+            setImportingImage(false);
+            paperCanvas.clearPaperCanvas();
+            paperCanvas.props.changeFormat(Formats.VECTOR_SKIP_CONVERT);
+            performSnapshot(paperCanvas.props.undoSnapshot, Formats.VECTOR_SKIP_CONVERT);
+        };
+
+        paper.project.importSVG(source, {
             expandShapes: true,
             insert: false,
+            onError: onImportFailed,
             onLoad: function (item) {
                 if (!item) {
-                    log.error('SVG import failed:');
-                    log.info(svg);
-                    setImportingImage(false);
-                    paperCanvas.props.changeFormat(Formats.VECTOR_SKIP_CONVERT);
-                    performSnapshot(paperCanvas.props.undoSnapshot, Formats.VECTOR_SKIP_CONVERT);
+                    onImportFailed();
                     return;
                 }
 
