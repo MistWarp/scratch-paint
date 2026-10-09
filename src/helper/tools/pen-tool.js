@@ -153,11 +153,11 @@ class PenTool extends paper.Tool {
         if (this.simplifySize > 0) {
             this.subpath.simplify(this.simplifySize);
         }
-        if (hasStartConnection && this.subpath.length > 0) {
+        if (hasStartConnection && this.subpath.segments.length > 0) {
             this.subpath.removeSegment(0);
         }
-        if (hasEndConnection && this.subpath.length > 0) {
-            this.subpath.removeSegment(this.subpath.length - 1);
+        if (hasEndConnection && this.subpath.segments.length > 0) {
+            this.subpath.removeSegment(this.subpath.segments.length - 1);
         }
         this.path.insertSegments(this.subpathIndex, this.subpath.segments);
         this.subpath = null;

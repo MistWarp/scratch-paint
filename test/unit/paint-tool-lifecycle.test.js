@@ -1,3 +1,4 @@
+/* eslint-env jest, browser */
 import paper from '@turbowarp/paper';
 import FillTool from '../../src/helper/tools/fill-tool';
 import PenTool from '../../src/helper/tools/pen-tool';
@@ -5,6 +6,8 @@ import OvalTool from '../../src/helper/tools/oval-tool';
 import {styleCursorPreview} from '../../src/helper/style-path';
 import GradientTypes from '../../src/lib/gradient-types';
 import {LineMode} from '../../src/containers/line-mode.jsx';
+import {setupLayers} from '../../src/helper/layer';
+import Formats from '../../src/lib/format';
 
 describe('paint tool lifecycle', () => {
     beforeEach(() => paper.setup(document.createElement('canvas')));
@@ -39,6 +42,30 @@ describe('paint tool lifecycle', () => {
         expect(() => tool.handleMouseDrag(event)).not.toThrow();
         expect(() => tool.handleMouseUp(event)).not.toThrow();
         expect(tool.onUpdateSvg).not.toHaveBeenCalled();
+    });
+
+    test('a short pen stroke ending on another line joins it', () => {
+        setupLayers(Formats.VECTOR);
+        const other = new paper.Path([new paper.Point(100, 100), new paper.Point(200, 100)]);
+        const tool = new PenTool(jest.fn(), jest.fn());
+        tool.setColorState({
+            strokeColor: {primary: '#000000', secondary: null, gradientType: GradientTypes.SOLID},
+            strokeWidth: 1
+        });
+        tool.setSimplifySize(0);
+        const penEvent = (x, y) => ({event: {button: 0}, point: new paper.Point(x, y)});
+        tool.handleMouseDown(penEvent(100, 94));
+        tool.handleMouseDrag(penEvent(100, 94.3));
+        tool.handleMouseDrag(penEvent(100, 94.6));
+        tool.handleMouseDrag(penEvent(100, 95.1));
+        expect(() => tool.handleMouseUp(penEvent(100, 95.1))).not.toThrow();
+        expect(tool.onUpdateSvg).toHaveBeenCalledTimes(1);
+        expect(other.isInserted()).toBe(false);
+        const joined = paper.project.activeLayer.children;
+        expect(joined).toHaveLength(1);
+        expect(joined[0].segments.map(segment => [segment.index, segment.point.x, segment.point.y])).toEqual([
+            [0, 100, 94], [1, 100, 94.3], [2, 100, 94.6], [3, 100, 100], [4, 200, 100]
+        ]);
     });
 
     test('ends bounding-box gestures before subsequent oval drag events', () => {
