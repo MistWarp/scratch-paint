@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 import paper from '@turbowarp/paper';
-import Formats, {isBitmap} from '../lib/format';
+import Formats from '../lib/format';
 import log from '../log/log';
 
 import {performSnapshot} from '../helper/undo';
@@ -37,12 +37,17 @@ class PaperCanvas extends React.Component {
             'maybeZoomToFit',
             'switchCostume',
             'onViewResize',
+            'onCanvasResize',
             'recalibrateSize'
         ]);
     }
     componentDidMount () {
         paper.setup(this.canvas);
         paper.view.on('resize', this.onViewResize);
+        if (typeof ResizeObserver !== 'undefined') {
+            this.resizeObserver = new ResizeObserver(this.onCanvasResize);
+            this.resizeObserver.observe(this.canvas);
+        }
         resetZoom();
         if (this.props.zoomLevelId) {
             this.props.setZoomLevelId(this.props.zoomLevelId);
@@ -84,6 +89,10 @@ class PaperCanvas extends React.Component {
         }
     }
     componentWillUnmount () {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = null;
+        }
         this.clearQueuedImport();
         // shouldZoomToFit means the zoom level hasn't been initialized yet
         if (!this.shouldZoomToFit) {
@@ -194,6 +203,8 @@ class PaperCanvas extends React.Component {
     maybeZoomToFit (isBitmapMode) {
         if (this.shouldZoomToFit instanceof paper.Matrix) {
             paper.view.matrix = this.shouldZoomToFit;
+            setWorkspaceBounds(true);
+            clampViewBounds();
             this.props.updateViewBounds(paper.view.matrix);
             resizeCrosshair();
         } else if (this.shouldZoomToFit === true) {
@@ -337,6 +348,11 @@ class PaperCanvas extends React.Component {
             this.props.updateViewBounds(paper.view.matrix);
         });
     }
+    onCanvasResize () {
+        this.recalibrateSize(() => {
+            this.props.updateViewBounds(paper.view.matrix);
+        });
+    }
     recalibrateSize (callback) {
         // Sets the size that Paper thinks the canvas is to the size the canvas element actually is.
         // When these are out of sync, the mouse events in the paint editor don't line up correctly.
@@ -350,7 +366,9 @@ class PaperCanvas extends React.Component {
             const elemSize = paper.DomElement.getSize(paper.view.element);
             elemSize.width = Math.round(elemSize.width);
             elemSize.height = Math.round(elemSize.height);
-            paper.view.setViewSize(elemSize);
+            if (elemSize.width > 0 && elemSize.height > 0) {
+                paper.view.setViewSize(elemSize);
+            }
 
             if (callback) callback();
         }, 0);
