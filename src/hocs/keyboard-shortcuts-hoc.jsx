@@ -50,6 +50,7 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
             ]);
         }
         handleKeyPress (event) {
+            if (!this.props.isActive()) return;
             if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
                 // Ignore keyboard shortcuts if a text input field is focused
                 return;
@@ -140,6 +141,7 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                 'changeMode',
                 'clearSelectedItems',
                 'format',
+                'isActive',
                 'mode',
                 'onCopyToClipboard',
                 'onPasteFromClipboard',
@@ -158,6 +160,7 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
         changeMode: PropTypes.func.isRequired,
         clearSelectedItems: PropTypes.func.isRequired,
         format: PropTypes.oneOf(Object.keys(Formats)),
+        isActive: PropTypes.func,
         mode: PropTypes.oneOf(Object.keys(Modes)).isRequired,
         onCopyToClipboard: PropTypes.func.isRequired,
         onPasteFromClipboard: PropTypes.func.isRequired,
@@ -166,6 +169,10 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
         onUpdateImage: PropTypes.func.isRequired,
         setSelectedItems: PropTypes.func.isRequired,
         textEditing: PropTypes.bool.isRequired
+    };
+
+    KeyboardShortcutsWrapper.defaultProps = {
+        isActive: () => true
     };
 
     const mapStateToProps = state => ({
