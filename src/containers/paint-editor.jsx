@@ -24,6 +24,7 @@ import {getSelectedLeafItems} from '../helper/selection';
 import {convertToBitmap, convertToVector} from '../helper/bitmap';
 import {resizeView, zoomOnSelection, zoomToFit, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
 import EyeDropperTool from '../helper/tools/eye-dropper';
+import {shouldShowNoiseNotice, dismissNoiseNotice} from '../helper/canvas-noise';
 
 import Modes, {BitmapModes, VectorModes} from '../lib/modes';
 import Formats, {isBitmap, isVector} from '../lib/format';
@@ -88,13 +89,15 @@ class PaintEditor extends React.Component {
             'stopEyeDroppingLoop',
             'handleSetSelectedItems',
             'handleChangeTheme',
+            'handleDismissNoiseNotice',
             'handleZoomIn',
             'handleZoomOut',
             'handleZoomReset'
         ]);
         this.state = {
             canvas: null,
-            colorInfo: null
+            colorInfo: null,
+            showNoiseNotice: shouldShowNoiseNotice()
         };
         this.props.setLayout(this.props.rtl ? 'rtl' : 'ltr');
         this.props.onCustomFontsChanged(this.props.customFonts);
@@ -230,6 +233,10 @@ class PaintEditor extends React.Component {
     getEffectiveTheme () {
         return this.props.reduxTheme === 'default' ? this.props.theme : this.props.reduxTheme;
     }
+    handleDismissNoiseNotice () {
+        dismissNoiseNotice();
+        this.setState({showNoiseNotice: false});
+    }
     handleChangeTheme () {
         const newTheme = this.getEffectiveTheme() === 'light' ? 'dark' : 'light';
         this.props.setReduxTheme(newTheme === this.props.theme ? 'default' : newTheme);
@@ -354,7 +361,9 @@ class PaintEditor extends React.Component {
                 width={this.props.width}
                 height={this.props.height}
                 zoomLevelId={this.props.zoomLevelId}
+                showNoiseNotice={this.state.showNoiseNotice}
                 onChangeTheme={this.handleChangeTheme}
+                onDismissNoiseNotice={this.handleDismissNoiseNotice}
                 onManageFonts={this.props.onManageFonts}
                 onRedo={this.props.onRedo}
                 onSwitchToBitmap={this.props.handleSwitchToBitmap}

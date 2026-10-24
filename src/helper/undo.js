@@ -3,6 +3,8 @@
 import paper from '@turbowarp/paper';
 import {hideGuideLayers, showGuideLayers, getRaster} from '../helper/layer';
 import {getSelectedLeafItems} from '../helper/selection';
+import {getHitBounds} from '../helper/bitmap';
+import {rememberCleanSnapshot, restoreCleanSnapshot} from '../helper/canvas-noise';
 import Formats, {isVector, isBitmap} from '../lib/format';
 import log from '../log/log';
 
@@ -16,10 +18,14 @@ const performSnapshot = function (dispatchPerformSnapshot, format) {
         log.error('Format must be specified.');
     }
     const guideLayers = hideGuideLayers();
-    dispatchPerformSnapshot({
+    const snapshot = {
         json: paper.project.exportJSON({asString: false}),
         paintEditorFormat: format
-    });
+    };
+    if (isBitmap(format)) {
+        rememberCleanSnapshot(snapshot, getRaster(), getHitBounds);
+    }
+    dispatchPerformSnapshot(snapshot);
     showGuideLayers(guideLayers);
 };
 
@@ -34,6 +40,7 @@ const _restore = function (entry, setSelectedItems, onUpdateImage, isBitmapMode)
         }
     }
     paper.project.importJSON(entry.json);
+    restoreCleanSnapshot(entry);
     setSelectedItems();
 
     // Ensure that all rasters are loaded before updating storage with new image data.

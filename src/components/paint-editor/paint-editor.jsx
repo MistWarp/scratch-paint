@@ -44,7 +44,7 @@ import TextMode from '../../containers/text-mode.jsx';
 import Formats, {isBitmap, isVector} from '../../lib/format';
 import styles from './paint-editor.css';
 
-import {Image, ZoomIn, ZoomOut, Scan, Palette, ChevronLeft, ChevronRight} from 'lucide-react';
+import {Image, ZoomIn, ZoomOut, Scan, Palette, ChevronLeft, ChevronRight, TriangleAlert, X} from 'lucide-react';
 
 const messages = defineMessages({
     bitmap: {
@@ -66,6 +66,17 @@ const messages = defineMessages({
         defaultMessage: 'Convert this costume to vector. The bitmap artwork will remain a pixel image.',
         description: 'Tooltip explaining the effect of converting a bitmap costume to vector',
         id: 'paint.paintEditor.vectorHelp'
+    },
+    canvasNoise: {
+        // eslint-disable-next-line max-len
+        defaultMessage: 'Your browser\'s fingerprinting protection adds noise to canvas images, so bitmap costumes can slowly turn grainy. To keep them clean, turn off fingerprinting protection for this site in the site settings next to the address bar.',
+        description: 'Notice shown in bitmap mode when the browser adds noise to canvas pixel reads',
+        id: 'paint.paintEditor.canvasNoise'
+    },
+    dismissCanvasNoise: {
+        defaultMessage: 'Dismiss',
+        description: 'Label for the button that hides the canvas noise notice',
+        id: 'paint.paintEditor.dismissCanvasNoise'
     }
 });
 
@@ -309,6 +320,33 @@ const PaintEditorComponent = props => (
                             </Box>
                         ) : null
                     }
+                    {props.showNoiseNotice && isBitmap(props.format) ? (
+                        <div
+                            className={styles.noiseNotice}
+                            role="status"
+                        >
+                            <TriangleAlert
+                                aria-hidden="true"
+                                className={styles.noiseNoticeIcon}
+                                size={16}
+                            />
+                            <span className={styles.noiseNoticeText}>
+                                {props.intl.formatMessage(messages.canvasNoise)}
+                            </span>
+                            <button
+                                aria-label={props.intl.formatMessage(messages.dismissCanvasNoise)}
+                                className={styles.noiseNoticeDismiss}
+                                title={props.intl.formatMessage(messages.dismissCanvasNoise)}
+                                type="button"
+                                onClick={props.onDismissNoiseNotice}
+                            >
+                                <X
+                                    aria-hidden="true"
+                                    size={14}
+                                />
+                            </button>
+                        </div>
+                    ) : null}
                 </ScrollableCanvas>
                 <div className={styles.canvasControls}>
                     {isVector(props.format) ?
@@ -416,6 +454,7 @@ PaintEditorComponent.propTypes = {
     isEyeDropping: PropTypes.bool,
     name: PropTypes.string,
     onChangeTheme: PropTypes.func.isRequired,
+    onDismissNoiseNotice: PropTypes.func,
     onManageFonts: PropTypes.func,
     onRedo: PropTypes.func.isRequired,
     onSwitchToBitmap: PropTypes.func.isRequired,
@@ -430,6 +469,7 @@ PaintEditorComponent.propTypes = {
     rotationCenterY: PropTypes.number,
     rtl: PropTypes.bool,
     setCanvas: PropTypes.func.isRequired,
+    showNoiseNotice: PropTypes.bool,
     setTextArea: PropTypes.func.isRequired,
     showRoundedRectMode: PropTypes.bool,
     textArea: PropTypes.instanceOf(Element),

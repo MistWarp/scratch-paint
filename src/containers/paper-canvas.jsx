@@ -7,6 +7,7 @@ import Formats from '../lib/format';
 import log from '../log/log';
 
 import {performSnapshot} from '../helper/undo';
+import {forgetCleanSnapshots, getCleanExport} from '../helper/canvas-noise';
 import {undoSnapshot, clearUndoState} from '../reducers/undo';
 import {isGroup, ungroupItems} from '../helper/group';
 import {clearRaster, convertBackgroundGuideLayer, getRaster, setupLayers, updateTheme} from '../helper/layer';
@@ -72,13 +73,14 @@ class PaperCanvas extends React.Component {
         setupLayers(this.props.format);
         updateTheme(this.props.theme);
         this.importImage(
-            this.props.imageFormat, this.props.image, this.props.rotationCenterX, this.props.rotationCenterY);
+            this.props.imageFormat, this.props.image, this.props.rotationCenterX, this.props.rotationCenterY,
+            this.props.imageId);
     }
     componentWillReceiveProps (newProps) {
         if (this.props.imageId !== newProps.imageId) {
             this.switchCostume(newProps.imageFormat, newProps.image,
                 newProps.rotationCenterX, newProps.rotationCenterY,
-                this.props.zoomLevelId, newProps.zoomLevelId);
+                this.props.zoomLevelId, newProps.zoomLevelId, newProps.imageId);
         }
         if (this.props.format !== newProps.format) {
             this.recalibrateSize();
@@ -111,7 +113,7 @@ class PaperCanvas extends React.Component {
             this.queuedImageToLoad = null;
         }
     }
-    switchCostume (format, image, rotationCenterX, rotationCenterY, oldZoomLevelId, newZoomLevelId) {
+    switchCostume (format, image, rotationCenterX, rotationCenterY, oldZoomLevelId, newZoomLevelId, imageId) {
         if (oldZoomLevelId && oldZoomLevelId !== newZoomLevelId) {
             this.props.saveZoomLevel();
         }
@@ -127,7 +129,7 @@ class PaperCanvas extends React.Component {
         this.props.clearSelectedItems();
         this.props.clearHoveredItem();
         this.props.clearPasteOffset();
-        this.importImage(format, image, rotationCenterX, rotationCenterY);
+        this.importImage(format, image, rotationCenterX, rotationCenterY, imageId);
     }
     clearPaperCanvas () {
         for (const layer of paper.project.layers) {
@@ -140,7 +142,7 @@ class PaperCanvas extends React.Component {
             }
         }
     }
-    importImage (format, image, rotationCenterX, rotationCenterY) {
+    importImage (format, image, rotationCenterX, rotationCenterY, imageId) {
         // Stop any in-progress imports
         this.clearQueuedImport();
 
@@ -180,7 +182,7 @@ class PaperCanvas extends React.Component {
                 }
 
                 getRaster().drawImage(
-                    imgElement,
+                    getCleanExport(imageId, imgElement, rotationCenterX, rotationCenterY) || imgElement,
                     (ART_BOARD_WIDTH / 2) - rotationCenterX,
                     (ART_BOARD_HEIGHT / 2) - rotationCenterY);
 
@@ -429,6 +431,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(undoSnapshot(snapshot));
     },
     clearUndo: () => {
+        forgetCleanSnapshots();
         dispatch(clearUndoState());
     },
     clearSelectedItems: () => {
