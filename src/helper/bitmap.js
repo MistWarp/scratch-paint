@@ -1,6 +1,7 @@
 import paper from '@turbowarp/paper';
 import {createCanvas, clearRaster, getRaster, hideGuideLayers, showGuideLayers} from './layer';
 import {getGuideColor} from './guides';
+import {getFillColorTolerance} from './canvas-noise';
 import {clearSelection} from './selection';
 import {ART_BOARD_WIDTH, ART_BOARD_HEIGHT, CENTER, MAX_WORKSPACE_BOUNDS} from './view';
 import Formats from '../lib/format';
@@ -576,54 +577,43 @@ const convertToVector = function (clearSelectedItems, onUpdateImage) {
     onUpdateImage(false /* skipSnapshot */, Formats.VECTOR /* formatOverride */);
 };
 
-const getColor_ = function (x, y, context) {
-    return context.getImageData(x, y, 1, 1).data;
-};
-
-const matchesColor_ = function (x, y, imageData, oldColor) {
-    const index = ((y * imageData.width) + x) * 4;
+const matchesColor_ = function (data, index, oldColor, tolerance) {
+    if (oldColor[3] === 0 || data[index + 3] === 0) {
+        return oldColor[3] === data[index + 3];
+    }
     return (
-        imageData.data[index + 0] === oldColor[0] &&
-        imageData.data[index + 1] === oldColor[1] &&
-        imageData.data[index + 2] === oldColor[2] &&
-        imageData.data[index + 3] === oldColor[3]
+        Math.abs(data[index + 0] - oldColor[0]) <= tolerance &&
+        Math.abs(data[index + 1] - oldColor[1]) <= tolerance &&
+        Math.abs(data[index + 2] - oldColor[2]) <= tolerance &&
+        Math.abs(data[index + 3] - oldColor[3]) <= tolerance
     );
 };
 
-const colorPixel_ = function (x, y, imageData, newColor) {
-    const index = ((y * imageData.width) + x) * 4;
-    imageData.data[index + 0] = newColor[0];
-    imageData.data[index + 1] = newColor[1];
-    imageData.data[index + 2] = newColor[2];
-    imageData.data[index + 3] = newColor[3];
-};
-
 /**
- * Flood fill beginning at the given point.
+ * Flood fill one column beginning at the given point.
  * Based on http://www.williammalone.com/articles/html5-canvas-javascript-paint-bucket-tool/
  *
- * @param {!int} x The x coordinate on the context at which to begin
- * @param {!int} y The y coordinate on the context at which to begin
- * @param {!ImageData} sourceImageData The image data to sample from. This is edited by the function.
- * @param {!ImageData} destImageData The image data to edit. May match sourceImageData. Should match
- *     size of sourceImageData.
- * @param {!Array<number>} newColor The color to replace with. A length 4 array [r, g, b, a].
- * @param {!Array<number>} oldColor The color to replace. A length 4 array [r, g, b, a].
- *     This must be different from newColor.
+ * @param {!int} x The x coordinate at which to begin
+ * @param {!int} y The y coordinate at which to begin
+ * @param {!object} fill The fill being computed: source pixels, size, color to replace, tolerance and filled pixels
  * @param {!Array<Array<int>>} stack The stack of pixels we need to look at
  */
-const floodFillInternal_ = function (x, y, sourceImageData, destImageData, newColor, oldColor, stack) {
-    while (y > 0 && matchesColor_(x, y - 1, sourceImageData, oldColor)) {
+const floodFillInternal_ = function (x, y, fill, stack) {
+    const {data, width, height, oldColor, tolerance, filled} = fill;
+    const fillable = (px, py) => {
+        const pixel = (py * width) + px;
+        return !filled[pixel] && matchesColor_(data, pixel * 4, oldColor, tolerance);
+    };
+    while (y > 0 && fillable(x, y - 1)) {
         y--;
     }
     let lastLeftMatchedColor = false;
     let lastRightMatchedColor = false;
-    for (; y < sourceImageData.height; y++) {
-        if (!matchesColor_(x, y, sourceImageData, oldColor)) break;
-        colorPixel_(x, y, sourceImageData, newColor);
-        colorPixel_(x, y, destImageData, newColor);
+    for (; y < height; y++) {
+        if (!fillable(x, y)) break;
+        filled[(y * width) + x] = 1;
         if (x > 0) {
-            if (matchesColor_(x - 1, y, sourceImageData, oldColor)) {
+            if (fillable(x - 1, y)) {
                 if (!lastLeftMatchedColor) {
                     stack.push([x - 1, y]);
                     lastLeftMatchedColor = true;
@@ -632,8 +622,8 @@ const floodFillInternal_ = function (x, y, sourceImageData, destImageData, newCo
                 lastLeftMatchedColor = false;
             }
         }
-        if (x < sourceImageData.width - 1) {
-            if (matchesColor_(x + 1, y, sourceImageData, oldColor)) {
+        if (x < width - 1) {
+            if (fillable(x + 1, y)) {
                 if (!lastRightMatchedColor) {
                     stack.push([x + 1, y]);
                     lastRightMatchedColor = true;
@@ -660,6 +650,44 @@ const fillStyleToColor_ = function (fillStyleString) {
     return context.getImageData(0, 0, 1, 1).data;
 };
 
+const startFill_ = function (x, y, color, sourceContext, destContext) {
+    const {width, height} = sourceContext.canvas;
+    const data = sourceContext.getImageData(0, 0, width, height).data;
+    const start = ((y * width) + x) * 4;
+    const inBounds = x >= 0 && y >= 0 && x < width && y < height;
+    const oldColor = inBounds ? data.slice(start, start + 4) : [0, 0, 0, 0];
+    const tolerance = getFillColorTolerance();
+    const noOpTolerance = destContext === sourceContext ? tolerance : 0;
+    if (matchesColor_(fillStyleToColor_(color), 0, oldColor, noOpTolerance)) return null;
+    return {
+        data,
+        width,
+        height,
+        oldColor,
+        tolerance,
+        filled: new Uint8Array(width * height)
+    };
+};
+
+const commitFill_ = function (fill, color, destContext) {
+    const {width, height, filled} = fill;
+    const mask = new ImageData(width, height);
+    for (let pixel = 0; pixel < filled.length; pixel++) {
+        if (filled[pixel]) mask.data[(pixel * 4) + 3] = 255;
+    }
+    const maskContext = createCanvas(width, height).getContext('2d');
+    maskContext.putImageData(mask, 0, 0);
+    destContext.save();
+    destContext.globalCompositeOperation = 'destination-out';
+    destContext.drawImage(maskContext.canvas, 0, 0);
+    maskContext.globalCompositeOperation = 'source-in';
+    maskContext.fillStyle = color;
+    maskContext.fillRect(0, 0, width, height);
+    destContext.globalCompositeOperation = 'source-over';
+    destContext.drawImage(maskContext.canvas, 0, 0);
+    destContext.restore();
+};
+
 /**
  * Flood fill beginning at the given point
  * @param {!number} x The x coordinate on the context at which to begin
@@ -673,25 +701,15 @@ const fillStyleToColor_ = function (fillStyleString) {
 const floodFill = function (x, y, color, sourceContext, destContext) {
     x = ~~x;
     y = ~~y;
-    const newColor = fillStyleToColor_(color);
-    const oldColor = getColor_(x, y, sourceContext);
-    const sourceImageData = sourceContext.getImageData(0, 0, sourceContext.canvas.width, sourceContext.canvas.height);
-    let destImageData = sourceImageData;
-    if (destContext !== sourceContext) {
-        destImageData = new ImageData(sourceContext.canvas.width, sourceContext.canvas.height);
-    }
-    if (oldColor[0] === newColor[0] &&
-            oldColor[1] === newColor[1] &&
-            oldColor[2] === newColor[2] &&
-            oldColor[3] === newColor[3]) { // no-op
-        return false;
-    }
+    if (x < 0 || y < 0 || x >= sourceContext.canvas.width || y >= sourceContext.canvas.height) return false;
+    const fill = startFill_(x, y, color, sourceContext, destContext);
+    if (!fill) return false;
     const stack = [[x, y]];
     while (stack.length) {
         const pop = stack.pop();
-        floodFillInternal_(pop[0], pop[1], sourceImageData, destImageData, newColor, oldColor, stack);
+        floodFillInternal_(pop[0], pop[1], fill, stack);
     }
-    destContext.putImageData(destImageData, 0, 0);
+    commitFill_(fill, color, destContext);
     return true;
 };
 
@@ -707,27 +725,15 @@ const floodFill = function (x, y, color, sourceContext, destContext) {
 const floodFillAll = function (x, y, color, sourceContext, destContext) {
     x = ~~x;
     y = ~~y;
-    const newColor = fillStyleToColor_(color);
-    const oldColor = getColor_(x, y, sourceContext);
-    const sourceImageData = sourceContext.getImageData(0, 0, sourceContext.canvas.width, sourceContext.canvas.height);
-    let destImageData = sourceImageData;
-    if (destContext !== sourceContext) {
-        destImageData = new ImageData(sourceContext.canvas.width, sourceContext.canvas.height);
-    }
-    if (oldColor[0] === newColor[0] &&
-            oldColor[1] === newColor[1] &&
-            oldColor[2] === newColor[2] &&
-            oldColor[3] === newColor[3]) { // no-op
-        return false;
-    }
-    for (let i = 0; i < sourceImageData.width; i++) {
-        for (let j = 0; j < sourceImageData.height; j++) {
-            if (matchesColor_(i, j, sourceImageData, oldColor)) {
-                colorPixel_(i, j, destImageData, newColor);
-            }
+    const fill = startFill_(x, y, color, sourceContext, destContext);
+    if (!fill) return false;
+    const {data, oldColor, tolerance, filled} = fill;
+    for (let pixel = 0; pixel < filled.length; pixel++) {
+        if (matchesColor_(data, pixel * 4, oldColor, tolerance)) {
+            filled[pixel] = 1;
         }
     }
-    destContext.putImageData(destImageData, 0, 0);
+    commitFill_(fill, color, destContext);
     return true;
 };
 

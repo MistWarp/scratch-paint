@@ -146,6 +146,60 @@ $border-radius: 0.25rem;
     border-color: $form-border;
 }
 
+.noise-notice {
+    position: absolute;
+    top: $grid-unit;
+    left: 50%;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: calc(2 * $grid-unit);
+    width: max-content;
+    max-width: calc(100% - 4 * $grid-unit);
+    padding: calc(2 * $grid-unit) $grid-unit calc(2 * $grid-unit) calc(3 * $grid-unit);
+    border-radius: $form-radius;
+    background: #fff3d6;
+    color: #6b4a00;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    font-size: .75rem;
+    line-height: 1.4;
+    transform: translateX(-50%);
+}
+[data-paint-theme="dark"] .noise-notice {
+    background: #3d3018;
+    color: #ffdc94;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .4);
+}
+
+.noise-notice-icon {
+    flex-shrink: 0;
+}
+
+.noise-notice-text {
+    max-width: 32rem;
+}
+
+.noise-notice-dismiss {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: none;
+    border-radius: .25rem;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+.noise-notice-dismiss:hover {
+    background: rgba(0, 0, 0, .08);
+}
+[data-paint-theme="dark"] .noise-notice-dismiss:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
 .mode-selector {
     display: flex;
     max-width: 7.5rem;

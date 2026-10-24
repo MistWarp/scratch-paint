@@ -14,6 +14,7 @@ import {getSelectedLeafItems} from '../helper/selection';
 import {getRaster, hideGuideLayers, showGuideLayers} from '../helper/layer';
 import {commitRectToBitmap, commitOvalToBitmap, commitSelectionToBitmap, getHitBounds} from '../helper/bitmap';
 import {performSnapshot} from '../helper/undo';
+import {rememberCleanExport} from '../helper/canvas-noise';
 import {scaleWithStrokes} from '../helper/math';
 
 import {
@@ -109,12 +110,15 @@ const UpdateImageHOC = function (WrappedComponent) {
             }
 
             const imageData = plasteredRaster.getImageData(rect);
+            const rotationCenterX = (ART_BOARD_WIDTH / 2) - rect.x;
+            const rotationCenterY = (ART_BOARD_HEIGHT / 2) - rect.y;
+            rememberCleanExport(this.props.imageId, plasteredRaster, rect, imageData, rotationCenterX, rotationCenterY);
 
             this.props.onUpdateImage(
                 false /* isVector */,
                 imageData,
-                (ART_BOARD_WIDTH / 2) - rect.x,
-                (ART_BOARD_HEIGHT / 2) - rect.y);
+                rotationCenterX,
+                rotationCenterY);
 
             if (!skipSnapshot) {
                 performSnapshot(this.props.undoSnapshot, Formats.BITMAP);
@@ -188,6 +192,7 @@ const UpdateImageHOC = function (WrappedComponent) {
 
     UpdateImageWrapper.propTypes = {
         format: PropTypes.oneOf(Object.keys(Formats)),
+        imageId: PropTypes.string,
         mode: PropTypes.oneOf(Object.keys(Modes)).isRequired,
         onUpdateImage: PropTypes.func.isRequired,
         undoSnapshot: PropTypes.func.isRequired,
