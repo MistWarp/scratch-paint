@@ -3,7 +3,6 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import React from 'react';
-import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
 
 import PaperCanvas from '../../containers/paper-canvas.jsx';
@@ -44,7 +43,7 @@ import TextMode from '../../containers/text-mode.jsx';
 import Formats, {isBitmap, isVector} from '../../lib/format';
 import styles from './paint-editor.css';
 
-import {Image, ZoomIn, ZoomOut, Scan, Palette, ChevronLeft, ChevronRight, TriangleAlert, X} from 'lucide-react';
+import {Image, ZoomIn, ZoomOut, Scan, Palette, TriangleAlert, X} from 'lucide-react';
 
 const messages = defineMessages({
     bitmap: {
@@ -80,40 +79,13 @@ const messages = defineMessages({
     }
 });
 
-const ResponsiveToolStrip = props => {
-    const toolStrip = React.useRef(null);
-    const scrollTools = distance => {
-        if (toolStrip.current) {
-            toolStrip.current.scrollBy({left: distance, behavior: 'smooth'});
-        }
-    };
-    return (
-        <div className={styles.toolStripPanel}>
-            <Button
-                aria-label="Previous paint tools"
-                className={styles.toolStripScrollButton}
-                title="Previous paint tools"
-                onClick={() => scrollTools(-240)} // eslint-disable-line react/jsx-no-bind
-            >
-                <ChevronLeft />
-            </Button>
-            <div
-                className={classNames(styles.modeSelector, props.modeSelectorClassName)}
-                ref={toolStrip}
-            >
-                {props.children}
-            </div>
-            <Button
-                aria-label="More paint tools"
-                className={styles.toolStripScrollButton}
-                title="More paint tools"
-                onClick={() => scrollTools(240)} // eslint-disable-line react/jsx-no-bind
-            >
-                <ChevronRight />
-            </Button>
+const ResponsiveToolStrip = props => (
+    <div className={styles.toolStripPanel}>
+        <div className={classNames(styles.modeSelector, props.modeSelectorClassName)}>
+            {props.children}
         </div>
-    );
-};
+    </div>
+);
 
 ResponsiveToolStrip.propTypes = {
     children: PropTypes.node.isRequired,
@@ -291,6 +263,7 @@ const PaintEditorComponent = props => (
                     canvas={props.canvas}
                     hideScrollbars={props.isEyeDropping}
                     style={styles.canvasContainer}
+                    onUndo={props.onUndo}
                 >
                     <PaperCanvas
                         canvasRef={props.setCanvas}

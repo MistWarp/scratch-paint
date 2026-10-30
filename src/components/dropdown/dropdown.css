@@ -38,13 +38,32 @@ $arrow-border-width: 14px;
 
 @media only screen and (max-width: 600px) {
     .dropdown {
-        min-height: 2.75rem;
-        padding: .65rem .75rem;
-        border-radius: 6px;
+        display: inline-flex;
+        box-sizing: border-box;
+        min-width: 5.5rem;
+        height: 2.5rem;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 .75rem;
+        border-color: $form-border;
+        border-radius: .5rem;
+        background: $ui-background;
+        color: $text-primary;
+        font-size: .75rem;
+        font-weight: 600;
+    }
+
+    .mod-open {
+        background: $form-border;
     }
 
     .dropdown-icon {
-        width: .65rem;
-        height: .65rem;
+        width: .625rem;
+        height: .625rem;
+        padding: 0;
+    }
+
+    .dropdown-icon g {
+        color: inherit !important;
     }
 }

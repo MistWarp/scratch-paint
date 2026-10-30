@@ -12,6 +12,8 @@ import {redrawSelectionBox} from '../reducers/selected-items';
 import {getEventXY} from '../lib/touch-utils';
 import bindAll from 'lodash.bindall';
 
+const MAX_GESTURE_ZOOM = 16;
+
 class ScrollableCanvas extends React.Component {
     static get ZOOM_INCREMENT () {
         return 0.5;
@@ -28,36 +30,134 @@ class ScrollableCanvas extends React.Component {
             'handleVerticalScrollbarMouseDown',
             'handleVerticalScrollbarMouseMove',
             'handleVerticalScrollbarMouseUp',
-            'handleWheel'
+            'handleWheel',
+            'handleTouchStart',
+            'handleGestureMove',
+            'handleGestureEnd'
         ]);
+        this.gesture = null;
     }
     componentDidMount () {
-        if (this.props.canvas) {
-            this.props.canvas.addEventListener('wheel', this.handleWheel);
-            this.props.canvas.addEventListener('mousedown', this.handleMouseDown);
-        }
+        if (this.props.canvas) this.addCanvasListeners(this.props.canvas);
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.canvas !== this.props.canvas) {
-            if (this.props.canvas) {
-                this.props.canvas.removeEventListener('wheel', this.handleWheel);
-                this.props.canvas.removeEventListener('mousedown', this.handleMouseDown);
-            }
-            if (nextProps.canvas) {
-                nextProps.canvas.addEventListener('wheel', this.handleWheel);
-                nextProps.canvas.addEventListener('mousedown', this.handleMouseDown);
-            }
+            if (this.props.canvas) this.removeCanvasListeners(this.props.canvas);
+            if (nextProps.canvas) this.addCanvasListeners(nextProps.canvas);
         }
     }
     componentWillUnmount () {
-        if (this.props.canvas) {
-            this.props.canvas.removeEventListener('wheel', this.handleWheel);
-            this.props.canvas.removeEventListener('mousedown', this.handleMouseDown);
-        }
+        if (this.props.canvas) this.removeCanvasListeners(this.props.canvas);
+        this.stopGesture();
         const event = {preventDefault: () => {}};
         this.handleDragEnd(event);
         this.handleHorizontalScrollbarMouseUp(event);
         this.handleVerticalScrollbarMouseUp(event);
+    }
+    addCanvasListeners (canvas) {
+        canvas.addEventListener('wheel', this.handleWheel);
+        canvas.addEventListener('mousedown', this.handleMouseDown);
+        canvas.addEventListener('touchstart', this.handleTouchStart, {capture: true, passive: false});
+    }
+    removeCanvasListeners (canvas) {
+        canvas.removeEventListener('wheel', this.handleWheel);
+        canvas.removeEventListener('mousedown', this.handleMouseDown);
+        canvas.removeEventListener('touchstart', this.handleTouchStart, {capture: true});
+    }
+    handleTouchStart (event) {
+        if (!this.gesture && event.touches.length < 2) {
+            this.undoPointerAtTouch = this.props.undoPointer;
+            return;
+        }
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (!this.gesture) {
+            this.cancelStroke(event);
+            window.addEventListener('touchmove', this.handleGestureMove, {capture: true, passive: false});
+            window.addEventListener('touchend', this.handleGestureEnd, {capture: true});
+            window.addEventListener('touchcancel', this.handleGestureEnd, {capture: true});
+        }
+        this.anchorGesture(event.touches);
+    }
+    cancelStroke (event) {
+        const ended = new Event('touchcancel', {bubbles: true});
+        Object.defineProperties(ended, {
+            touches: {value: []},
+            targetTouches: {value: []},
+            changedTouches: {value: [event.touches[0]]}
+        });
+        document.dispatchEvent(ended);
+        const pointer = this.undoPointerAtTouch;
+        setTimeout(() => {
+            if (typeof pointer === 'number' && this.props.undoPointer > pointer && this.props.onUndo) {
+                this.props.onUndo();
+            }
+        });
+    }
+    gestureCenter (touches) {
+        const rect = this.props.canvas.getBoundingClientRect();
+        let x = 0;
+        let y = 0;
+        for (let i = 0; i < touches.length; i++) {
+            x += touches[i].clientX;
+            y += touches[i].clientY;
+        }
+        return new paper.Point((x / touches.length) - rect.left, (y / touches.length) - rect.top);
+    }
+    gestureSpread (touches) {
+        if (touches.length < 2) return 0;
+        return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+    }
+    anchorGesture (touches) {
+        this.gesture = {
+            anchor: paper.view.viewToProject(this.gestureCenter(touches)),
+            spread: this.gestureSpread(touches),
+            zoom: paper.view.zoom
+        };
+    }
+    handleGestureMove (event) {
+        if (!this.gesture) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const touches = event.touches;
+        if (!touches.length) return;
+        const center = this.gestureCenter(touches);
+        const spread = this.gestureSpread(touches);
+        if (spread && this.gesture.spread) {
+            const zoom = Math.min(MAX_GESTURE_ZOOM, this.gesture.zoom * (spread / this.gesture.spread));
+            zoomOnFixedPoint(zoom - paper.view.zoom, paper.view.viewToProject(center));
+        }
+        const current = paper.view.viewToProject(center);
+        pan(this.gesture.anchor.x - current.x, this.gesture.anchor.y - current.y);
+        if (!this.gestureFrame) {
+            this.gestureFrame = requestAnimationFrame(() => {
+                this.gestureFrame = null;
+                this.props.updateViewBounds(paper.view.matrix);
+                this.props.redrawSelectionBox();
+            });
+        }
+    }
+    handleGestureEnd (event) {
+        if (!this.gesture) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (event.touches.length) {
+            this.anchorGesture(event.touches);
+            return;
+        }
+        this.stopGesture();
+        this.props.updateViewBounds(paper.view.matrix);
+        this.props.redrawSelectionBox();
+    }
+    stopGesture () {
+        this.gesture = null;
+        if (this.gestureFrame) {
+            cancelAnimationFrame(this.gestureFrame);
+            this.gestureFrame = null;
+        }
+        window.removeEventListener('touchmove', this.handleGestureMove, {capture: true});
+        window.removeEventListener('touchend', this.handleGestureEnd, {capture: true});
+        window.removeEventListener('touchcancel', this.handleGestureEnd, {capture: true});
     }
     handleMouseDown (event) {
         if (event.button === 1) {
@@ -213,12 +313,15 @@ ScrollableCanvas.propTypes = {
     canvas: PropTypes.instanceOf(Element),
     children: PropTypes.node.isRequired,
     hideScrollbars: PropTypes.bool,
+    onUndo: PropTypes.func,
     redrawSelectionBox: PropTypes.func.isRequired,
     style: PropTypes.string,
+    undoPointer: PropTypes.number,
     updateViewBounds: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
+    undoPointer: state.scratchPaint.undo.pointer,
     viewBounds: state.scratchPaint.viewBounds
 });
 const mapDispatchToProps = dispatch => ({

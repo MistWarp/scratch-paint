@@ -30,7 +30,10 @@ const ColorIndicatorComponent = props => (
             preferPlace="below"
             onOuterAction={props.onCloseColor}
         >
-            <Label text={props.label}>
+            <Label
+                inline
+                text={props.label}
+            >
                 <ColorButton
                     color={props.color}
                     color2={props.color2}

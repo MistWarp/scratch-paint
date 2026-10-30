@@ -67,11 +67,13 @@ Edited to add input-range-small
 
 @media only screen and (max-width: 600px) {
     .input-form {
-        height: 2.75rem;
-        border-radius: 6px;
+        box-sizing: border-box;
+        height: 2.5rem;
+        border-radius: .5rem;
     }
 
-    .input-small {
-        width: 4rem;
+    .input-small,
+    .input-small-range {
+        width: 3.5rem;
     }
 }
