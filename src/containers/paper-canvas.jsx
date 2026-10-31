@@ -353,9 +353,9 @@ class PaperCanvas extends React.Component {
     onCanvasResize () {
         this.recalibrateSize(() => {
             this.props.updateViewBounds(paper.view.matrix);
-        });
+        }, true);
     }
-    recalibrateSize (callback) {
+    recalibrateSize (callback, keepCenter) {
         // Sets the size that Paper thinks the canvas is to the size the canvas element actually is.
         // When these are out of sync, the mouse events in the paint editor don't line up correctly.
         return window.setTimeout(() => {
@@ -369,7 +369,14 @@ class PaperCanvas extends React.Component {
             elemSize.width = Math.round(elemSize.width);
             elemSize.height = Math.round(elemSize.height);
             if (elemSize.width > 0 && elemSize.height > 0) {
+                const viewSize = paper.view.viewSize;
+                const resized = viewSize.width !== elemSize.width || viewSize.height !== elemSize.height;
+                const center = keepCenter && resized ? new paper.Point(paper.view.center.x, paper.view.center.y) : null;
                 paper.view.setViewSize(elemSize);
+                if (center) {
+                    paper.view.center = center;
+                    clampViewBounds();
+                }
             }
 
             if (callback) callback();

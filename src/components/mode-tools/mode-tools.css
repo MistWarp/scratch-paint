@@ -174,7 +174,7 @@ $border-radius: 0.25rem;
 
 @media only screen and (max-width: 600px) {
     .mode-tools {
-        min-height: 2.5rem;
+        min-height: 2.25rem;
         gap: .375rem;
     }
 

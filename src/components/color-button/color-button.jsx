@@ -25,7 +25,13 @@ const colorToBackground = (color, color2, gradientType) => {
 
 const ColorButtonComponent = props => (
     <div
-        className={styles.colorButton}
+        aria-label={props.label}
+        className={classNames(styles.colorButton, {
+            [styles.modCompact]: props.compact
+        })}
+        role={props.compact ? 'button' : null}
+        tabIndex={props.compact ? 0 : null}
+        title={props.label}
         onClick={props.onClick}
     >
         <div
@@ -57,12 +63,15 @@ const ColorButtonComponent = props => (
 ColorButtonComponent.propTypes = {
     color: PropTypes.string,
     color2: PropTypes.string,
+    compact: PropTypes.bool,
     gradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
+    label: PropTypes.string,
     onClick: PropTypes.func.isRequired,
     outline: PropTypes.bool.isRequired
 };
 
 ColorButtonComponent.defaultProps = {
+    compact: false,
     outline: false
 };
 

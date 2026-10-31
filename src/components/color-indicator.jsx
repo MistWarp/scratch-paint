@@ -30,24 +30,37 @@ const ColorIndicatorComponent = props => (
             preferPlace="below"
             onOuterAction={props.onCloseColor}
         >
-            <Label
-                inline
-                text={props.label}
-            >
+            {props.compact ? (
                 <ColorButton
+                    compact
                     color={props.color}
                     color2={props.color2}
                     gradientType={props.gradientType}
+                    label={props.label}
                     onClick={props.onOpenColor}
                     outline={props.outline}
                 />
-            </Label>
+            ) : (
+                <Label
+                    inline
+                    text={props.label}
+                >
+                    <ColorButton
+                        color={props.color}
+                        color2={props.color2}
+                        gradientType={props.gradientType}
+                        onClick={props.onOpenColor}
+                        outline={props.outline}
+                    />
+                </Label>
+            )}
         </Popover>
     </InputGroup>
 );
 
 ColorIndicatorComponent.propTypes = {
     className: PropTypes.string,
+    compact: PropTypes.bool,
     disabled: PropTypes.bool.isRequired,
     color: PropTypes.string,
     color2: PropTypes.string,

@@ -152,14 +152,14 @@ $mobile-gap: .375rem;
 
     .costume-input {
         width: 100%;
-        height: 2.5rem;
+        height: 2.25rem;
     }
 
     .button-group-button {
         display: inline-grid;
         box-sizing: border-box;
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2.25rem;
+        height: 2.25rem;
         padding: 0;
         place-items: center;
         background: $ui-background;

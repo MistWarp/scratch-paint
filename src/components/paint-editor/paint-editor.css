@@ -283,188 +283,231 @@ $border-radius: 0.25rem;
     }
 }
 
-$mobile-gap: .375rem;
+$phone-gap: .375rem;
+$phone-control: 2.25rem;
+$phone-tool: 2.5rem;
 $scrollbar-room: 12px;
+$floating-shadow: 0 2px 12px rgba(0, 0, 0, .2);
 
-@media only screen and (max-width: 600px) {
-    .editor-container {
-        min-width: 0;
-        padding: $mobile-gap;
-    }
+.phone-layout {
+    min-width: 0;
+    padding: 0;
+}
 
-    .editor-container-top {
-        min-width: 0;
-        padding-bottom: 0;
-        border-bottom: 0;
-        overflow: visible;
-    }
+.phone-bar {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: $phone-gap;
+    padding: $phone-gap;
+}
 
-    .editor-container-top > .row {
-        min-width: 0;
-        flex-wrap: wrap;
-        gap: $mobile-gap;
-    }
+.phone-bar > :first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
 
-    .editor-container-top > .row > * {
-        margin: 0 !important;
-    }
+.phone-colors {
+    display: flex;
+    flex: 0 0 auto;
+    gap: $phone-gap;
+}
 
-    .row + .row {
-        margin-top: $mobile-gap;
-    }
+.phone-colors > * {
+    margin: 0 !important;
+}
 
-    .mod-labeled-icon-height {
-        min-width: 0;
-        height: auto;
-        min-height: 2.5rem;
-    }
+.phone-layout .top-align-row {
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
 
-    .editor-container-top > .row > .mod-labeled-icon-height {
-        flex: 1 1 15rem;
-        gap: $mobile-gap;
-    }
+.phone-layout .controls-container {
+    position: relative;
+    order: 1;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    margin: 0;
+}
 
-    .mod-labeled-icon-height > * {
-        margin: 0 !important;
-    }
+.phone-layout .canvas-container {
+    min-width: 0;
+    min-height: 8rem;
+    border: 0;
+    border-radius: 0;
+    overflow: hidden;
+}
 
-    .mod-labeled-icon-height > :not(:last-child),
-    .mod-labeled-icon-height > :only-child {
-        flex: 1 1 0;
-        min-width: 0;
-    }
+.phone-context {
+    position: absolute;
+    top: $phone-gap;
+    left: $phone-gap;
+    z-index: 2;
+    display: flex;
+    max-width: calc(100% - 2 * $phone-gap - $scrollbar-room);
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $phone-gap;
+    padding: .25rem;
+    border-radius: .75rem;
+    background: $ui-background;
+    box-shadow: $floating-shadow;
+}
 
-    .mod-mode-tools,
-    [dir="rtl"] .mod-mode-tools {
-        width: auto;
-        min-width: 0;
-        flex: 0 0 auto;
-        margin: 0;
-    }
+[dir="rtl"] .phone-context {
+    right: $phone-gap;
+    left: auto;
+}
 
-    [dir="ltr"] .mod-dashed-border,
-    [dir="rtl"] .mod-dashed-border {
-        padding-right: 0;
-        padding-left: 0;
-        border: 0;
-    }
+.phone-context:empty {
+    display: none;
+}
 
-    .top-align-row {
-        min-width: 0;
-        min-height: 0;
-        padding-top: $mobile-gap;
-        flex: 1 1 auto;
-        flex-direction: column;
-    }
+.phone-context > *,
+.phone-mode-tools {
+    margin: 0 !important;
+}
 
-    .tool-strip-panel {
-        display: block;
-        order: 2;
-        width: 100%;
-        box-sizing: border-box;
-        flex: 0 0 auto;
-        margin-top: $mobile-gap;
-        border-radius: .75rem;
-        background: $ui-background;
-    }
+.phone-layout .canvas-controls {
+    position: absolute;
+    right: calc($phone-gap + $scrollbar-room);
+    bottom: calc($phone-gap + $scrollbar-room);
+    left: $phone-gap;
+    height: auto;
+    margin: 0;
+    align-items: center;
+    gap: $phone-gap;
+    pointer-events: none;
+}
 
-    .tool-strip-panel .mode-selector {
-        display: grid;
-        width: auto !important;
-        min-width: 0 !important;
-        max-width: none;
-        position: static;
-        grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr));
-        grid-auto-rows: 2.5rem;
-        gap: $mobile-gap;
-        padding: $mobile-gap;
-        border: 0;
-        border-radius: 0;
-        background: transparent;
-        box-shadow: none;
-    }
+.phone-layout .canvas-controls > * {
+    pointer-events: auto;
+}
 
-    .controls-container {
-        position: relative;
-        order: 1;
-        width: 100%;
-        min-width: 0;
-        min-height: 0;
-        flex: 1 1 auto;
-        margin: 0;
-    }
+.phone-layout .bitmap-button {
+    min-width: 0;
+    height: $phone-control;
+    min-height: 0;
+    flex: 0 1 auto;
+    padding: 0 .75rem;
+    border: 0;
+    border-radius: calc($phone-control / 2);
+    background: $ui-background;
+    box-shadow: $floating-shadow;
+}
 
-    .canvas-container {
-        min-width: 0;
-        min-height: 8rem;
-        border-radius: .75rem;
-        overflow: hidden;
-    }
+.phone-layout .bitmap-button:hover {
+    color: $text-primary;
+}
 
-    .canvas-controls {
-        position: absolute;
-        right: calc($mobile-gap + $scrollbar-room);
-        bottom: calc($mobile-gap + $scrollbar-room);
-        left: $mobile-gap;
-        height: auto;
-        margin: 0;
-        align-items: flex-end;
-        gap: $mobile-gap;
-        pointer-events: none;
-    }
+.phone-layout .zoom-controls {
+    flex: 0 0 auto;
+    margin: 0;
+}
 
-    .canvas-controls > * {
-        pointer-events: auto;
-    }
+.phone-layout .viewport-controls {
+    display: flex;
+    overflow: hidden;
+    border-radius: calc($phone-control / 2);
+    background: $ui-background;
+    box-shadow: $floating-shadow;
+}
 
-    .bitmap-button {
-        min-width: 0;
-        min-height: 2.5rem;
-        flex: 0 1 auto;
-        padding: 0 calc(3 * $grid-unit);
-        border-color: transparent;
-        border-radius: 1.25rem;
-        background: $ui-background;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, .18);
-    }
+.phone-layout .viewport-controls .button-group-button,
+[dir="ltr"] .phone-layout .viewport-controls .button-group-button,
+[dir="rtl"] .phone-layout .viewport-controls .button-group-button {
+    display: inline-grid;
+    width: $phone-control;
+    height: $phone-control;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    place-items: center;
+}
 
-    .bitmap-button:hover {
-        border-color: transparent;
-        color: $text-primary;
-    }
+.phone-layout .button-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-    .zoom-controls {
-        flex: 0 0 auto;
-        margin: 0;
-    }
+.phone-layout .tool-strip-panel {
+    display: block;
+    order: 2;
+    flex: 0 0 auto;
+    padding: $phone-gap;
+}
 
-    .viewport-controls {
-        display: flex;
-        overflow: hidden;
-        border-radius: 1.25rem;
-        background: $ui-background;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, .18);
-    }
+.phone-layout .tool-strip-panel .mode-selector {
+    display: grid;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none;
+    position: static;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-template-rows: $phone-tool;
+    gap: $phone-gap;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
 
-    .button-text {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+.shape-group {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+}
 
-    .button-group-button {
-        display: inline-grid;
-        width: 2.5rem;
-        height: 2.5rem;
-        padding: 0;
-        place-items: center;
-    }
+.shape-group-button {
+    display: grid;
+    width: 100%;
+    height: $phone-tool;
+    padding: 0;
+    border: 0;
+    border-radius: .25rem;
+    place-items: center;
+    color: $text-primary;
+    background: transparent;
+    cursor: pointer;
+    touch-action: manipulation;
+}
 
-    [dir="ltr"] .viewport-controls .button-group-button,
-    [dir="rtl"] .viewport-controls .button-group-button {
-        border: 0;
-        border-radius: 0;
-    }
+.shape-group-button.is-active {
+    color: white;
+    background: $motion-primary;
+}
+
+.shape-popover {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + $phone-gap + .25rem);
+    z-index: 20;
+    display: none;
+    grid-auto-flow: column;
+    grid-auto-columns: $phone-tool;
+    grid-template-rows: $phone-tool;
+    gap: $phone-gap;
+    padding: $phone-gap;
+    border-radius: .75rem;
+    background: $ui-background;
+    box-shadow: $floating-shadow;
+}
+
+[dir="rtl"] .shape-popover {
+    right: auto;
+    left: 0;
+}
+
+.shape-popover.is-open {
+    display: grid;
 }
 
 .text-area {

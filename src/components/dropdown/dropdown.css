@@ -40,8 +40,9 @@ $arrow-border-width: 14px;
     .dropdown {
         display: inline-flex;
         box-sizing: border-box;
-        min-width: 5.5rem;
-        height: 2.5rem;
+        min-width: 0;
+        height: 2.25rem;
+        gap: .5rem;
         align-items: center;
         justify-content: space-between;
         padding: 0 .75rem;

@@ -33,9 +33,14 @@ class ScrollableCanvas extends React.Component {
             'handleWheel',
             'handleTouchStart',
             'handleGestureMove',
-            'handleGestureEnd'
+            'handleGestureEnd',
+            'handleStrokeStarted',
+            'handleStrokeEnded'
         ]);
         this.gesture = null;
+        this.stroke = null;
+        this.strokePending = false;
+        this.canvasTouches = new Set();
     }
     componentDidMount () {
         if (this.props.canvas) this.addCanvasListeners(this.props.canvas);
@@ -58,38 +63,70 @@ class ScrollableCanvas extends React.Component {
         canvas.addEventListener('wheel', this.handleWheel);
         canvas.addEventListener('mousedown', this.handleMouseDown);
         canvas.addEventListener('touchstart', this.handleTouchStart, {capture: true, passive: false});
+        canvas.addEventListener('touchstart', this.handleStrokeStarted);
+        canvas.addEventListener('touchend', this.handleStrokeEnded);
+        canvas.addEventListener('touchcancel', this.handleStrokeEnded);
     }
     removeCanvasListeners (canvas) {
         canvas.removeEventListener('wheel', this.handleWheel);
         canvas.removeEventListener('mousedown', this.handleMouseDown);
         canvas.removeEventListener('touchstart', this.handleTouchStart, {capture: true});
+        canvas.removeEventListener('touchstart', this.handleStrokeStarted);
+        canvas.removeEventListener('touchend', this.handleStrokeEnded);
+        canvas.removeEventListener('touchcancel', this.handleStrokeEnded);
+    }
+    undoTop () {
+        const undoState = this.props.undoState;
+        return undoState ? undoState.stack[undoState.pointer] : null;
+    }
+    ownTouches (touches) {
+        return Array.prototype.filter.call(touches, touch => this.canvasTouches.has(touch.identifier));
+    }
+    ownsAny (touches) {
+        return Array.prototype.some.call(touches, touch => this.canvasTouches.has(touch.identifier));
     }
     handleTouchStart (event) {
-        if (!this.gesture && event.touches.length < 2) {
-            this.undoPointerAtTouch = this.props.undoPointer;
+        Array.prototype.forEach.call(event.changedTouches, touch => this.canvasTouches.add(touch.identifier));
+        const own = this.ownTouches(event.touches);
+        if (!this.gesture && own.length < 2) {
+            this.strokePending = !this.stroke;
             return;
         }
         event.preventDefault();
         event.stopImmediatePropagation();
         if (!this.gesture) {
-            this.cancelStroke(event);
+            this.strokePending = false;
+            if (this.stroke) this.cancelStroke(own[0]);
             window.addEventListener('touchmove', this.handleGestureMove, {capture: true, passive: false});
             window.addEventListener('touchend', this.handleGestureEnd, {capture: true});
             window.addEventListener('touchcancel', this.handleGestureEnd, {capture: true});
         }
-        this.anchorGesture(event.touches);
+        this.anchorGesture(own);
     }
-    cancelStroke (event) {
+    handleStrokeStarted () {
+        if (!this.strokePending) return;
+        this.strokePending = false;
+        this.stroke = {top: this.undoTop()};
+    }
+    handleStrokeEnded (event) {
+        Array.prototype.forEach.call(event.changedTouches, touch => this.canvasTouches.delete(touch.identifier));
+        if (!this.ownTouches(event.touches).length) {
+            this.stroke = null;
+            this.strokePending = false;
+        }
+    }
+    cancelStroke (touch) {
+        const stroke = this.stroke;
+        this.stroke = null;
         const ended = new Event('touchcancel', {bubbles: true});
         Object.defineProperties(ended, {
             touches: {value: []},
             targetTouches: {value: []},
-            changedTouches: {value: [event.touches[0]]}
+            changedTouches: {value: [touch]}
         });
         document.dispatchEvent(ended);
-        const pointer = this.undoPointerAtTouch;
         setTimeout(() => {
-            if (typeof pointer === 'number' && this.props.undoPointer > pointer && this.props.onUndo) {
+            if (this.undoTop() !== stroke.top && this.props.onUndo) {
                 this.props.onUndo();
             }
         });
@@ -116,10 +153,10 @@ class ScrollableCanvas extends React.Component {
         };
     }
     handleGestureMove (event) {
-        if (!this.gesture) return;
+        if (!this.gesture || !this.ownsAny(event.changedTouches)) return;
         event.preventDefault();
         event.stopImmediatePropagation();
-        const touches = event.touches;
+        const touches = this.ownTouches(event.touches);
         if (!touches.length) return;
         const center = this.gestureCenter(touches);
         const spread = this.gestureSpread(touches);
@@ -138,11 +175,13 @@ class ScrollableCanvas extends React.Component {
         }
     }
     handleGestureEnd (event) {
-        if (!this.gesture) return;
+        if (!this.gesture || !this.ownsAny(event.changedTouches)) return;
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (event.touches.length) {
-            this.anchorGesture(event.touches);
+        Array.prototype.forEach.call(event.changedTouches, touch => this.canvasTouches.delete(touch.identifier));
+        const remaining = this.ownTouches(event.touches);
+        if (remaining.length) {
+            this.anchorGesture(remaining);
             return;
         }
         this.stopGesture();
@@ -151,6 +190,9 @@ class ScrollableCanvas extends React.Component {
     }
     stopGesture () {
         this.gesture = null;
+        this.stroke = null;
+        this.strokePending = false;
+        this.canvasTouches.clear();
         if (this.gestureFrame) {
             cancelAnimationFrame(this.gestureFrame);
             this.gestureFrame = null;
@@ -316,12 +358,15 @@ ScrollableCanvas.propTypes = {
     onUndo: PropTypes.func,
     redrawSelectionBox: PropTypes.func.isRequired,
     style: PropTypes.string,
-    undoPointer: PropTypes.number,
+    undoState: PropTypes.shape({
+        pointer: PropTypes.number,
+        stack: PropTypes.arrayOf(PropTypes.object)
+    }),
     updateViewBounds: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-    undoPointer: state.scratchPaint.undo.pointer,
+    undoState: state.scratchPaint.undo,
     viewBounds: state.scratchPaint.viewBounds
 });
 const mapDispatchToProps = dispatch => ({
