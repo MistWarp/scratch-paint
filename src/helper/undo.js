@@ -92,6 +92,15 @@ const performRedo = function (undoState, dispatchPerformRedo, setSelectedItems, 
     }
 };
 
+const performRestore = function (savedState, dispatchPerformRestore, setSelectedItems, onUpdateImage) {
+    const state = savedState && savedState.stack[savedState.pointer];
+    if (!state) return;
+    _restore(state, setSelectedItems, onUpdateImage, isBitmap(state.paintEditorFormat));
+    const format = isVector(state.paintEditorFormat) ? Formats.VECTOR_SKIP_CONVERT :
+        isBitmap(state.paintEditorFormat) ? Formats.BITMAP_SKIP_CONVERT : null;
+    dispatchPerformRestore(format);
+};
+
 const shouldShowUndo = function (undoState) {
     return undoState.pointer > 0;
 };
@@ -104,6 +113,7 @@ export {
     performSnapshot,
     performUndo,
     performRedo,
+    performRestore,
     shouldShowUndo,
     shouldShowRedo
 };

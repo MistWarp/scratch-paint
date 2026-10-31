@@ -7,9 +7,9 @@ import {connect} from 'react-redux';
 import {getSelectedLeafItems} from '../helper/selection';
 import {setSelectedItems} from '../reducers/selected-items';
 import {
-    performUndo, performRedo, shouldShowUndo, shouldShowRedo
+    performUndo, performRedo, performRestore, shouldShowUndo, shouldShowRedo
 } from '../helper/undo';
-import {undo, redo} from '../reducers/undo';
+import {undo, redo, restoreUndoState} from '../reducers/undo';
 
 import Formats, {isBitmap} from '../lib/format';
 
@@ -20,6 +20,7 @@ const UndoHOC = function (WrappedComponent) {
             bindAll(this, [
                 'handleUndo',
                 'handleRedo',
+                'handleRestore',
                 'handleSetSelectedItems',
                 'shouldShowUndo',
                 'shouldShowRedo'
@@ -30,6 +31,10 @@ const UndoHOC = function (WrappedComponent) {
         }
         handleRedo () {
             performRedo(this.props.undoState, this.props.onRedo, this.handleSetSelectedItems, this.props.onUpdateImage);
+        }
+        handleRestore (savedState) {
+            performRestore(savedState, format => this.props.onRestore(savedState, format),
+                this.handleSetSelectedItems, this.props.onUpdateImage);
         }
         handleSetSelectedItems () {
             this.props.setSelectedItems(this.props.format);
@@ -45,6 +50,7 @@ const UndoHOC = function (WrappedComponent) {
                 'format',
                 'onUndo',
                 'onRedo',
+                'onRestore',
                 'setSelectedItems',
                 'undoState']);
             return (
@@ -52,6 +58,7 @@ const UndoHOC = function (WrappedComponent) {
                     shouldShowRedo={this.shouldShowRedo}
                     shouldShowUndo={this.shouldShowUndo}
                     onRedo={this.handleRedo}
+                    onRestoreUndo={this.handleRestore}
                     onUndo={this.handleUndo}
                     {...componentProps}
                 />
@@ -62,6 +69,7 @@ const UndoHOC = function (WrappedComponent) {
     UndoWrapper.propTypes = {
         format: PropTypes.oneOf(Object.keys(Formats)),
         onRedo: PropTypes.func.isRequired,
+        onRestore: PropTypes.func.isRequired,
         onUndo: PropTypes.func.isRequired,
         onUpdateImage: PropTypes.func.isRequired,
         setSelectedItems: PropTypes.func.isRequired,
@@ -84,6 +92,9 @@ const UndoHOC = function (WrappedComponent) {
         },
         onRedo: format => {
             dispatch(redo(format));
+        },
+        onRestore: (state, format) => {
+            dispatch(restoreUndoState(state, format));
         }
     });
 

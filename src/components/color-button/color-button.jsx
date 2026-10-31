@@ -25,8 +25,21 @@ const colorToBackground = (color, color2, gradientType) => {
 
 const ColorButtonComponent = props => (
     <div
-        className={styles.colorButton}
+        aria-label={props.label}
+        className={classNames(styles.colorButton, {
+            [styles.modCompact]: props.compact
+        })}
+        aria-disabled={props.compact && props.disabled ? 'true' : null}
+        role={props.compact ? 'button' : null}
+        tabIndex={props.compact && !props.disabled ? 0 : null}
+        title={props.label}
         onClick={props.onClick}
+        onKeyDown={props.compact ? event => { // eslint-disable-line react/jsx-no-bind
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                props.onClick(event);
+            }
+        } : null}
     >
         <div
             className={classNames(styles.colorButtonSwatch, {
@@ -57,12 +70,16 @@ const ColorButtonComponent = props => (
 ColorButtonComponent.propTypes = {
     color: PropTypes.string,
     color2: PropTypes.string,
+    compact: PropTypes.bool,
+    disabled: PropTypes.bool,
     gradientType: PropTypes.oneOf(Object.keys(GradientTypes)).isRequired,
+    label: PropTypes.string,
     onClick: PropTypes.func.isRequired,
     outline: PropTypes.bool.isRequired
 };
 
 ColorButtonComponent.defaultProps = {
+    compact: false,
     outline: false
 };
 

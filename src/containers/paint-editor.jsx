@@ -22,7 +22,7 @@ import {setCustomFonts} from '../reducers/custom-fonts';
 
 import {getSelectedLeafItems} from '../helper/selection';
 import {convertToBitmap, convertToVector} from '../helper/bitmap';
-import {resizeView, zoomOnSelection, zoomToFit, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
+import {isViewRotated, resizeView, zoomOnSelection, zoomToFit, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
 import EyeDropperTool from '../helper/tools/eye-dropper';
 import {shouldShowNoiseNotice, dismissNoiseNotice} from '../helper/canvas-noise';
 
@@ -300,6 +300,10 @@ class PaintEditor extends React.Component {
         }
     }
     startEyeDroppingLoop () {
+        if (isViewRotated()) {
+            paper.view.rotation = 0;
+            this.straightenedForEyeDropper = true;
+        }
         this.eyeDropper = new EyeDropperTool(
             this.canvas,
             paper.project.view.bounds.width,
@@ -337,6 +341,10 @@ class PaintEditor extends React.Component {
     stopEyeDroppingLoop () {
         cancelAnimationFrame(this.animationFrameId);
         this.setState({colorInfo: null});
+        if (this.straightenedForEyeDropper) {
+            this.straightenedForEyeDropper = false;
+            this.props.updateViewBounds(paper.view.matrix);
+        }
     }
     render () {
         return (
@@ -366,6 +374,7 @@ class PaintEditor extends React.Component {
                 onDismissNoiseNotice={this.handleDismissNoiseNotice}
                 onManageFonts={this.props.onManageFonts}
                 onRedo={this.props.onRedo}
+                onRestoreUndo={this.props.onRestoreUndo}
                 onSwitchToBitmap={this.props.handleSwitchToBitmap}
                 onSwitchToVector={this.props.handleSwitchToVector}
                 onUndo={this.props.onUndo}
@@ -405,6 +414,7 @@ PaintEditor.propTypes = {
     onDeactivateEyeDropper: PropTypes.func.isRequired,
     onKeyPress: PropTypes.func.isRequired,
     onRedo: PropTypes.func.isRequired,
+    onRestoreUndo: PropTypes.func,
     onUndo: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     onUpdateName: PropTypes.func.isRequired,

@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import {connect} from 'react-redux';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import React from 'react';
-import MediaQuery from 'react-responsive';
 import PropTypes from 'prop-types';
+import MediaQuery from 'react-responsive';
 
 import PaperCanvas from '../../containers/paper-canvas.jsx';
 import ScrollableCanvas from '../../containers/scrollable-canvas.jsx';
@@ -42,9 +42,10 @@ import StrokeWidthIndicatorComponent from '../../containers/stroke-width-indicat
 import TextMode from '../../containers/text-mode.jsx';
 
 import Formats, {isBitmap, isVector} from '../../lib/format';
+import Modes from '../../lib/modes';
 import styles from './paint-editor.css';
 
-import {Image, ZoomIn, ZoomOut, Scan, Palette, ChevronLeft, ChevronRight, TriangleAlert, X} from 'lucide-react';
+import {Image, ZoomIn, ZoomOut, Scan, Palette, Shapes, TriangleAlert, X} from 'lucide-react';
 
 const messages = defineMessages({
     bitmap: {
@@ -77,213 +78,342 @@ const messages = defineMessages({
         defaultMessage: 'Dismiss',
         description: 'Label for the button that hides the canvas noise notice',
         id: 'paint.paintEditor.dismissCanvasNoise'
+    },
+    shapes: {
+        defaultMessage: 'Shapes',
+        description: 'Label for the phone toolbar button that opens the shape tools',
+        id: 'paint.paintEditor.shapes'
     }
 });
 
-const ResponsiveToolStrip = props => {
-    const toolStrip = React.useRef(null);
-    const scrollTools = distance => {
-        if (toolStrip.current) {
-            toolStrip.current.scrollBy({left: distance, behavior: 'smooth'});
-        }
-    };
-    return (
-        <div className={styles.toolStripPanel}>
-            <Button
-                aria-label="Previous paint tools"
-                className={styles.toolStripScrollButton}
-                title="Previous paint tools"
-                onClick={() => scrollTools(-240)} // eslint-disable-line react/jsx-no-bind
-            >
-                <ChevronLeft />
-            </Button>
-            <div
-                className={classNames(styles.modeSelector, props.modeSelectorClassName)}
-                ref={toolStrip}
-            >
-                {props.children}
-            </div>
-            <Button
-                aria-label="More paint tools"
-                className={styles.toolStripScrollButton}
-                title="More paint tools"
-                onClick={() => scrollTools(240)} // eslint-disable-line react/jsx-no-bind
-            >
-                <ChevronRight />
-            </Button>
+const PHONE_QUERY = {maxWidth: 600};
+
+const SHAPE_MODES = [
+    Modes.LINE, Modes.OVAL, Modes.RECT, Modes.ROUNDED_RECT, Modes.TRIANGLE, Modes.SUSSY, Modes.ARROW,
+    Modes.BIT_LINE, Modes.BIT_OVAL, Modes.BIT_RECT
+];
+
+const ResponsiveToolStrip = props => (
+    <div className={styles.toolStripPanel}>
+        <div className={classNames(styles.modeSelector, props.modeSelectorClassName)}>
+            {props.children}
         </div>
-    );
-};
+    </div>
+);
 
 ResponsiveToolStrip.propTypes = {
     children: PropTypes.node.isRequired,
     modeSelectorClassName: PropTypes.string.isRequired
 };
 
-const PaintEditorComponent = props => (
+const ShapeToolGroup = props => {
+    const [open, setOpen] = React.useState(false);
+    const group = React.useRef(null);
+    React.useEffect(() => {
+        if (!open) return;
+        const close = event => {
+            if (group.current && !group.current.contains(event.target)) setOpen(false);
+        };
+        document.addEventListener('pointerdown', close);
+        return () => document.removeEventListener('pointerdown', close);
+    }, [open]);
+    const active = SHAPE_MODES.indexOf(props.mode) !== -1;
+    const label = props.intl.formatMessage(messages.shapes);
+    return (
+        <div
+            className={styles.shapeGroup}
+            ref={group}
+        >
+            <button
+                aria-expanded={open}
+                aria-label={label}
+                className={classNames(styles.shapeGroupButton, {
+                    [styles.isActive]: active
+                })}
+                title={label}
+                type="button"
+                onClick={() => setOpen(!open)} // eslint-disable-line react/jsx-no-bind
+            >
+                <Shapes
+                    aria-hidden="true"
+                    size={24}
+                />
+            </button>
+            <div
+                className={classNames(styles.shapePopover, {
+                    [styles.isOpen]: open
+                })}
+                onClick={() => setOpen(false)} // eslint-disable-line react/jsx-no-bind
+            >
+                {props.children}
+            </div>
+        </div>
+    );
+};
+
+ShapeToolGroup.propTypes = {
+    children: PropTypes.node.isRequired,
+    intl: intlShape,
+    mode: PropTypes.string
+};
+
+const shapeGroup = (intl, mode, shapes) => (
+    <ShapeToolGroup
+        intl={intl}
+        key="shapes"
+        mode={mode}
+    >
+        {shapes}
+    </ShapeToolGroup>
+);
+
+const VectorTools = props => {
+    const shapes = [
+        <LineMode
+            key="line"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <OvalMode
+            key="oval"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <RectMode
+            key="rect"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        props.showRoundedRectMode ? (
+            <RoundedRectMode
+                key="rounded-rect"
+                onUpdateImage={props.onUpdateImage}
+            />
+        ) : null,
+        <TriangleMode
+            key="triangle"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <SussyMode
+            key="sussy"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <ArrowMode
+            key="arrow"
+            onUpdateImage={props.onUpdateImage}
+        />
+    ];
+    const tools = [
+        <SelectMode
+            key="select"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <ReshapeMode
+            key="reshape"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <BrushMode
+            key="brush"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <EraserMode
+            key="eraser"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <PenMode
+            key="pen"
+            onUpdateSvg={props.onUpdateImage}
+        />,
+        <FillMode
+            key="fill"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <TextMode
+            key="text"
+            textArea={props.textArea}
+            onUpdateImage={props.onUpdateImage}
+        />
+    ].concat(props.phone ? [shapeGroup(props.intl, props.mode, shapes)] : shapes);
+    return (
+        <ResponsiveToolStrip modeSelectorClassName={styles.vectorModeSelector}>
+            {tools}
+        </ResponsiveToolStrip>
+    );
+};
+
+const BitmapTools = props => {
+    const shapes = [
+        <BitLineMode
+            key="line"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <BitOvalMode
+            key="oval"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <BitRectMode
+            key="rect"
+            onUpdateImage={props.onUpdateImage}
+        />
+    ];
+    const tools = [
+        <BitBrushMode
+            key="brush"
+            onUpdateImage={props.onUpdateImage}
+        />
+    ].concat(props.phone ? [] : shapes, [
+        <TextMode
+            isBitmap
+            key="text"
+            textArea={props.textArea}
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <BitFillMode
+            key="fill"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <BitEraserMode
+            key="eraser"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <BitSelectMode
+            key="select"
+            onUpdateImage={props.onUpdateImage}
+        />
+    ], props.phone ? [shapeGroup(props.intl, props.mode, shapes)] : []);
+    return (
+        <ResponsiveToolStrip modeSelectorClassName={styles.bitmapModeSelector}>
+            {tools}
+        </ResponsiveToolStrip>
+    );
+};
+
+const FixedTools = props => (
+    <FixedToolsContainer
+        canRedo={props.canRedo}
+        canUndo={props.canUndo}
+        name={props.name}
+        onRedo={props.onRedo}
+        onUndo={props.onUndo}
+        onUpdateImage={props.onUpdateImage}
+        onUpdateName={props.onUpdateName}
+        width={props.width}
+    />
+);
+
+const ModeTools = props => (
+    <InputGroup className={props.groupClassName}>
+        <ModeToolsContainer
+            onUpdateImage={props.onUpdateImage}
+            width={props.width}
+            height={props.height}
+            onManageFonts={props.onManageFonts}
+        />
+    </InputGroup>
+);
+
+const DesktopTop = props => (
+    <div className={styles.editorContainerTop}>
+        <div className={styles.row}>
+            <FixedTools {...props} />
+        </div>
+        {isVector(props.format) ?
+            <div className={styles.row}>
+                <InputGroup
+                    className={classNames(
+                        styles.row,
+                        styles.modDashedBorder,
+                        styles.modLabeledIconHeight
+                    )}
+                >
+                    <FillColorIndicatorComponent
+                        className={styles.modMarginAfter}
+                        onUpdateImage={props.onUpdateImage}
+                    />
+                    <StrokeColorIndicatorComponent
+                        onUpdateImage={props.onUpdateImage}
+                    />
+                    <StrokeWidthIndicatorComponent
+                        onUpdateImage={props.onUpdateImage}
+                    />
+                </InputGroup>
+                <ModeTools
+                    {...props}
+                    groupClassName={styles.modModeTools}
+                />
+            </div> :
+            isBitmap(props.format) ?
+                <div className={styles.row}>
+                    <InputGroup
+                        className={classNames(
+                            styles.row,
+                            styles.modDashedBorder,
+                            styles.modLabeledIconHeight
+                        )}
+                    >
+                        <FillColorIndicatorComponent
+                            className={styles.modMarginAfter}
+                            onUpdateImage={props.onUpdateImage}
+                        />
+                    </InputGroup>
+                    <ModeTools
+                        {...props}
+                        groupClassName={styles.modModeTools}
+                    />
+                </div> : null
+        }
+    </div>
+);
+
+const PhoneTop = props => (
+    <div className={styles.phoneBar}>
+        <FixedTools {...props} />
+        <div className={styles.phoneColors}>
+            <FillColorIndicatorComponent
+                compact
+                onUpdateImage={props.onUpdateImage}
+            />
+            {isVector(props.format) ? (
+                <StrokeColorIndicatorComponent
+                    compact
+                    onUpdateImage={props.onUpdateImage}
+                />
+            ) : null}
+        </div>
+    </div>
+);
+
+const STROKELESS_MODES = [Modes.BRUSH, Modes.TEXT, Modes.FILL];
+
+const PhoneContextBar = props => (
+    <div className={styles.phoneContext}>
+        {isVector(props.format) && STROKELESS_MODES.indexOf(props.mode) === -1 ? (
+            <StrokeWidthIndicatorComponent
+                onUpdateImage={props.onUpdateImage}
+            />
+        ) : null}
+        <ModeTools
+            {...props}
+            groupClassName={styles.phoneModeTools}
+        />
+    </div>
+);
+
+const PaintEditorLayout = props => (
     <div
-        className={styles.editorContainer}
+        className={classNames(styles.editorContainer, {
+            [styles.phoneLayout]: props.phone
+        })}
         dir={props.rtl ? 'rtl' : 'ltr'}
         data-paint-theme={props.theme}
     >
         {props.canvas !== null ? ( // eslint-disable-line no-negated-condition
-            <div className={styles.editorContainerTop}>
-                {/* First Row */}
-                <div className={styles.row}>
-                    <FixedToolsContainer
-                        canRedo={props.canRedo}
-                        canUndo={props.canUndo}
-                        name={props.name}
-                        onRedo={props.onRedo}
-                        onUndo={props.onUndo}
-                        onUpdateImage={props.onUpdateImage}
-                        onUpdateName={props.onUpdateName}
-                        width={props.width}
-                    />
-                </div>
-                {/* Second Row */}
-                {isVector(props.format) ?
-                    <div className={styles.row}>
-                        <InputGroup
-                            className={classNames(
-                                styles.row,
-                                styles.modDashedBorder,
-                                styles.modLabeledIconHeight
-                            )}
-                        >
-                            {/* fill */}
-                            <FillColorIndicatorComponent
-                                className={styles.modMarginAfter}
-                                onUpdateImage={props.onUpdateImage}
-                            />
-                            {/* stroke */}
-                            <StrokeColorIndicatorComponent
-                                onUpdateImage={props.onUpdateImage}
-                            />
-                            {/* stroke width */}
-                            <StrokeWidthIndicatorComponent
-                                onUpdateImage={props.onUpdateImage}
-                            />
-                        </InputGroup>
-                        <InputGroup className={styles.modModeTools}>
-                            <ModeToolsContainer
-                                onUpdateImage={props.onUpdateImage}
-                                width={props.width}
-                                height={props.height}
-                                onManageFonts={props.onManageFonts}
-                            />
-                        </InputGroup>
-                    </div> :
-                    isBitmap(props.format) ?
-                        <div className={styles.row}>
-                            <InputGroup
-                                className={classNames(
-                                    styles.row,
-                                    styles.modDashedBorder,
-                                    styles.modLabeledIconHeight
-                                )}
-                            >
-                                {/* fill */}
-                                <FillColorIndicatorComponent
-                                    className={styles.modMarginAfter}
-                                    onUpdateImage={props.onUpdateImage}
-                                />
-                            </InputGroup>
-                            <InputGroup className={styles.modModeTools}>
-                                <ModeToolsContainer
-                                    onUpdateImage={props.onUpdateImage}
-                                    width={props.width}
-                                    height={props.height}
-                                    onManageFonts={props.onManageFonts}
-                                />
-                            </InputGroup>
-                        </div> : null
-                }
-            </div>
+            props.phone ? <PhoneTop {...props} /> : <DesktopTop {...props} />
         ) : null}
 
         <div className={styles.topAlignRow}>
-            {/* Modes */}
-            {props.canvas !== null && isVector(props.format) ? ( // eslint-disable-line no-negated-condition
-                <ResponsiveToolStrip modeSelectorClassName={styles.vectorModeSelector}>
-                    <SelectMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <ReshapeMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <BrushMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <EraserMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <PenMode
-                        onUpdateSvg={props.onUpdateImage}
-                    />
-                    <FillMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <TextMode
-                        textArea={props.textArea}
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <LineMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <OvalMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <RectMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    {props.showRoundedRectMode && (
-                        <RoundedRectMode
-                            onUpdateImage={props.onUpdateImage}
-                        />
-                    )}
-                    <TriangleMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <SussyMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <ArrowMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                </ResponsiveToolStrip>
-            ) : null}
+            {props.canvas !== null && isVector(props.format) ? // eslint-disable-line no-negated-condition
+                <VectorTools {...props} /> : null}
 
-            {props.canvas !== null && isBitmap(props.format) ? ( // eslint-disable-line no-negated-condition
-                <ResponsiveToolStrip modeSelectorClassName={styles.bitmapModeSelector}>
-                    <BitBrushMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <BitLineMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <BitOvalMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <BitRectMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <TextMode
-                        isBitmap
-                        textArea={props.textArea}
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <BitFillMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <BitEraserMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                    <BitSelectMode
-                        onUpdateImage={props.onUpdateImage}
-                    />
-                </ResponsiveToolStrip>
-            ) : null}
+            {props.canvas !== null && isBitmap(props.format) ? // eslint-disable-line no-negated-condition
+                <BitmapTools {...props} /> : null}
 
             <div className={styles.controlsContainer}>
                 {/* Canvas */}
@@ -291,6 +421,9 @@ const PaintEditorComponent = props => (
                     canvas={props.canvas}
                     hideScrollbars={props.isEyeDropping}
                     style={styles.canvasContainer}
+                    onRedo={props.onRedo}
+                    onRestoreUndo={props.onRestoreUndo}
+                    onUndo={props.onUndo}
                 >
                     <PaperCanvas
                         canvasRef={props.setCanvas}
@@ -348,6 +481,7 @@ const PaintEditorComponent = props => (
                         </div>
                     ) : null}
                 </ScrollableCanvas>
+                {props.phone && props.canvas !== null ? <PhoneContextBar {...props} /> : null}
                 <div className={styles.canvasControls}>
                     {isVector(props.format) ?
                         <Button
@@ -438,12 +572,26 @@ const PaintEditorComponent = props => (
     </div>
 );
 
-PaintEditorComponent.propTypes = {
+
+const PaintEditorComponent = props => (
+    <MediaQuery {...PHONE_QUERY}>
+        {phone => (
+            <PaintEditorLayout
+                {...props}
+                phone={phone}
+            />
+        )}
+    </MediaQuery>
+);
+
+/* eslint-disable react/no-unused-prop-types */
+const editorPropTypes = {
     canRedo: PropTypes.func.isRequired,
     canUndo: PropTypes.func.isRequired,
     canvas: PropTypes.instanceOf(Element),
     colorInfo: Loupe.propTypes.colorInfo,
     format: PropTypes.oneOf(Object.keys(Formats)),
+    groupClassName: PropTypes.string,
     image: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.instanceOf(HTMLImageElement)
@@ -452,11 +600,13 @@ PaintEditorComponent.propTypes = {
     imageId: PropTypes.string,
     intl: intlShape,
     isEyeDropping: PropTypes.bool,
+    mode: PropTypes.string,
     name: PropTypes.string,
     onChangeTheme: PropTypes.func.isRequired,
     onDismissNoiseNotice: PropTypes.func,
     onManageFonts: PropTypes.func,
     onRedo: PropTypes.func.isRequired,
+    onRestoreUndo: PropTypes.func,
     onSwitchToBitmap: PropTypes.func.isRequired,
     onSwitchToVector: PropTypes.func.isRequired,
     onUndo: PropTypes.func.isRequired,
@@ -465,6 +615,7 @@ PaintEditorComponent.propTypes = {
     onZoomIn: PropTypes.func.isRequired,
     onZoomOut: PropTypes.func.isRequired,
     onZoomReset: PropTypes.func.isRequired,
+    phone: PropTypes.bool,
     rotationCenterX: PropTypes.number,
     rotationCenterY: PropTypes.number,
     rtl: PropTypes.bool,
@@ -479,7 +630,19 @@ PaintEditorComponent.propTypes = {
     zoomLevelId: PropTypes.string
 };
 
+PaintEditorComponent.propTypes = editorPropTypes;
+PaintEditorLayout.propTypes = editorPropTypes;
+DesktopTop.propTypes = editorPropTypes;
+PhoneTop.propTypes = editorPropTypes;
+PhoneContextBar.propTypes = editorPropTypes;
+VectorTools.propTypes = editorPropTypes;
+BitmapTools.propTypes = editorPropTypes;
+FixedTools.propTypes = editorPropTypes;
+ModeTools.propTypes = editorPropTypes;
+/* eslint-enable react/no-unused-prop-types */
+
 const mapStateToProps = state => ({
+    mode: state.scratchPaint.mode,
     showRoundedRectMode: state.scratchPaint.addonUtil.showRoundedRectMode
 });
 

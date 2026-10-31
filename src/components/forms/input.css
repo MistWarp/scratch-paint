@@ -67,11 +67,23 @@ Edited to add input-range-small
 
 @media only screen and (max-width: 600px) {
     .input-form {
-        height: 2.75rem;
-        border-radius: 6px;
+        box-sizing: border-box;
+        height: 2.25rem;
+        border-radius: .5rem;
     }
 
-    .input-small {
-        width: 4rem;
+    .input-small,
+    .input-small-range {
+        width: 3.5rem;
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
+    .input-small::-webkit-inner-spin-button,
+    .input-small::-webkit-outer-spin-button,
+    .input-small-range::-webkit-inner-spin-button,
+    .input-small-range::-webkit-outer-spin-button {
+        margin: 0;
+        -webkit-appearance: none;
     }
 }

@@ -14,7 +14,7 @@ import {clearRaster, convertBackgroundGuideLayer, getRaster, setupLayers, update
 import {clearSelectedItems} from '../reducers/selected-items';
 import {
     ART_BOARD_WIDTH, ART_BOARD_HEIGHT, CENTER, MAX_WORKSPACE_BOUNDS,
-    clampViewBounds, resetZoom, setWorkspaceBounds, zoomToFit, resizeCrosshair
+    clampViewBounds, isViewRotated, resetZoom, setWorkspaceBounds, zoomToFit, resizeCrosshair
 } from '../helper/view';
 import {ensureClockwise, scaleWithStrokes} from '../helper/math';
 import {clearHoveredItem} from '../reducers/hover';
@@ -125,6 +125,7 @@ class PaperCanvas extends React.Component {
             }
             this.props.setZoomLevelId(newZoomLevelId);
         }
+        if (isViewRotated()) paper.view.rotation = 0;
         this.props.clearUndo();
         this.props.clearSelectedItems();
         this.props.clearHoveredItem();
@@ -205,6 +206,7 @@ class PaperCanvas extends React.Component {
     maybeZoomToFit (isBitmapMode) {
         if (this.shouldZoomToFit instanceof paper.Matrix) {
             paper.view.matrix = this.shouldZoomToFit;
+            if (isViewRotated()) paper.view.rotation = 0;
             setWorkspaceBounds(true);
             clampViewBounds();
             this.props.updateViewBounds(paper.view.matrix);
@@ -353,9 +355,9 @@ class PaperCanvas extends React.Component {
     onCanvasResize () {
         this.recalibrateSize(() => {
             this.props.updateViewBounds(paper.view.matrix);
-        });
+        }, true);
     }
-    recalibrateSize (callback) {
+    recalibrateSize (callback, keepCenter) {
         // Sets the size that Paper thinks the canvas is to the size the canvas element actually is.
         // When these are out of sync, the mouse events in the paint editor don't line up correctly.
         return window.setTimeout(() => {
@@ -369,7 +371,14 @@ class PaperCanvas extends React.Component {
             elemSize.width = Math.round(elemSize.width);
             elemSize.height = Math.round(elemSize.height);
             if (elemSize.width > 0 && elemSize.height > 0) {
+                const viewSize = paper.view.viewSize;
+                const resized = viewSize.width !== elemSize.width || viewSize.height !== elemSize.height;
+                const center = keepCenter && resized ? new paper.Point(paper.view.center.x, paper.view.center.y) : null;
                 paper.view.setViewSize(elemSize);
+                if (center) {
+                    paper.view.center = center;
+                    clampViewBounds();
+                }
             }
 
             if (callback) callback();

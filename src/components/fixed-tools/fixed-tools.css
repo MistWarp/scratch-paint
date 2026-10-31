@@ -132,23 +132,57 @@ $border-radius: 0.25rem;
     margin-left: calc(2 * $grid-unit);
 }
 
+$mobile-gap: .375rem;
+
 @media only screen and (max-width: 600px) {
     .row {
         width: 100%;
         min-width: 0;
+        gap: $mobile-gap;
+    }
+
+    .row > * {
+        margin: 0 !important;
+    }
+
+    .row > :first-child {
+        flex: 1 1 auto;
+        min-width: 0;
     }
 
     .costume-input {
-        width: min(8rem, 36vw);
-        height: 2.75rem;
+        width: 100%;
+        height: 2.25rem;
     }
 
     .button-group-button {
         display: inline-grid;
-        width: 2.75rem;
-        height: 2.75rem;
+        box-sizing: border-box;
+        width: 2.25rem;
+        height: 2.25rem;
         padding: 0;
         place-items: center;
+        background: $ui-background;
+    }
+
+    [dir="ltr"] .button-group-button:last-of-type {
+        border-top-right-radius: .5rem;
+        border-bottom-right-radius: .5rem;
+    }
+
+    [dir="ltr"] .button-group-button:first-of-type {
+        border-top-left-radius: .5rem;
+        border-bottom-left-radius: .5rem;
+    }
+
+    [dir="rtl"] .button-group-button:last-of-type {
+        border-top-left-radius: .5rem;
+        border-bottom-left-radius: .5rem;
+    }
+
+    [dir="rtl"] .button-group-button:first-of-type {
+        border-top-right-radius: .5rem;
+        border-bottom-right-radius: .5rem;
     }
 
     .mod-dashed-border {

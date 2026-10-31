@@ -267,10 +267,6 @@ $border-radius: 0.25rem;
     display: contents;
 }
 
-.tool-strip-scroll-button {
-    display: none;
-}
-
 @media only screen and (max-width: $full-size-paint) {
     .editor-container {
         padding: calc(3 * $grid-unit) $grid-unit;
@@ -287,185 +283,232 @@ $border-radius: 0.25rem;
     }
 }
 
-@media only screen and (max-width: 600px) {
-    .editor-container {
-        min-width: 0;
-        padding: $grid-unit;
-    }
+$phone-gap: .375rem;
+$phone-control: 2.25rem;
+$phone-tool: 2.5rem;
+$scrollbar-room: 12px;
+$floating-shadow: 0 2px 12px rgba(0, 0, 0, .2);
 
-    .editor-container-top {
-        min-width: 0;
-        padding-bottom: $grid-unit;
-        border-bottom: 0;
-        overflow: visible;
-    }
+.phone-layout {
+    min-width: 0;
+    padding: 0;
+}
 
-    .editor-container-top > .row {
-        min-width: 0;
-        flex-wrap: wrap;
-        gap: $grid-unit 0;
-    }
+.phone-bar {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: $phone-gap;
+    padding: $phone-gap;
+}
 
-    .row + .row {
-        margin-top: calc(5 * $grid-unit);
-    }
+.phone-bar > :first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
 
-    .mod-labeled-icon-height {
-        min-width: 0;
-        height: auto;
-        min-height: 2.5rem;
-    }
+.phone-colors {
+    display: flex;
+    flex: 0 0 auto;
+    gap: $phone-gap;
+}
 
-    .mod-mode-tools {
-        width: auto;
-        min-width: 0;
-        flex: 0 0 auto;
-        margin-left: calc(2 * $grid-unit);
-    }
+.phone-colors > * {
+    margin: 0 !important;
+}
 
-    [dir="rtl"] .mod-mode-tools {
-        margin-right: calc(2 * $grid-unit);
-        margin-left: 0;
-    }
+.phone-layout .top-align-row {
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
 
-    [dir="ltr"] .mod-dashed-border,
-    [dir="rtl"] .mod-dashed-border {
-        padding-right: 0;
-        padding-left: 0;
-        border: 0;
-    }
+.phone-layout .controls-container {
+    position: relative;
+    order: 1;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    margin: 0;
+}
 
-    .top-align-row {
-        min-width: 0;
-        padding-top: $grid-unit;
-        flex-direction: column;
-    }
+.phone-layout .canvas-container {
+    min-width: 0;
+    min-height: 8rem;
+    border: 0;
+    border-radius: 0;
+    overflow: hidden;
+}
 
-    .tool-strip-panel {
-        display: flex;
-        width: 100%;
-        box-sizing: border-box;
-        flex: 0 0 auto;
-        align-items: stretch;
-        border: 1px solid $ui-pane-border;
-        border-radius: .5rem;
-        background: $ui-background;
-        overflow: hidden;
-    }
+.phone-context {
+    position: absolute;
+    top: $phone-gap;
+    left: $phone-gap;
+    z-index: 2;
+    display: flex;
+    max-width: calc(100% - 2 * $phone-gap - $scrollbar-room);
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $phone-gap;
+    padding: .25rem;
+    border-radius: .75rem;
+    background: $ui-background;
+    box-shadow: $floating-shadow;
+}
 
-    .tool-strip-panel .mode-selector {
-        display: grid;
-        width: 0 !important;
-        min-width: 0 !important;
-        max-width: none;
-        position: static;
-        flex: 1 1 auto;
-        grid-auto-flow: column;
-        grid-auto-columns: 2.75rem;
-        grid-template-rows: 2.75rem;
-        justify-content: flex-start;
-        gap: $grid-unit;
-        padding: calc(2 * $grid-unit);
-        border: 0;
-        border-radius: 0;
-        background: transparent;
-        box-shadow: none;
-        overflow-x: auto;
-        overflow-y: hidden;
-        overscroll-behavior-x: contain;
-        scrollbar-color: $ui-pane-border transparent;
-        scrollbar-width: thin;
-        touch-action: pan-x;
-        -webkit-overflow-scrolling: touch;
-    }
+[dir="rtl"] .phone-context {
+    right: $phone-gap;
+    left: auto;
+}
 
-    .tool-strip-panel .mode-selector::-webkit-scrollbar {
-        height: 5px;
-    }
+.phone-context:empty,
+.phone-context:not(:has(input, button, img, svg)) {
+    display: none;
+}
 
-    .tool-strip-panel .mode-selector::-webkit-scrollbar-thumb {
-        border-radius: 3px;
-        background: $ui-pane-border;
-    }
+.phone-context > *,
+.phone-mode-tools {
+    margin: 0 !important;
+}
 
-    .tool-strip-scroll-button {
-        display: inline-grid;
-        width: 2.75rem;
-        min-width: 2.75rem;
-        flex: 0 0 2.75rem;
-        min-height: 3.75rem;
-        place-items: center;
-        color: $text-primary;
-        background: $ui-background;
-        z-index: 1;
-    }
+.phone-layout .canvas-controls {
+    position: absolute;
+    right: calc($phone-gap + $scrollbar-room);
+    bottom: calc($phone-gap + $scrollbar-room);
+    left: $phone-gap;
+    height: auto;
+    margin: 0;
+    align-items: center;
+    gap: $phone-gap;
+    pointer-events: none;
+}
 
-    .tool-strip-scroll-button svg {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
+.phone-layout .canvas-controls > * {
+    pointer-events: auto;
+}
 
-    .tool-strip-scroll-button:first-child {
-        border-right: 1px solid $ui-pane-border;
-    }
+.phone-layout .bitmap-button {
+    min-width: 0;
+    height: $phone-control;
+    min-height: 0;
+    flex: 0 1 auto;
+    padding: 0 .75rem;
+    border: 0;
+    border-radius: calc($phone-control / 2);
+    background: $ui-background;
+    box-shadow: $floating-shadow;
+}
 
-    .tool-strip-scroll-button:last-child {
-        border-left: 1px solid $ui-pane-border;
-    }
+.phone-layout .bitmap-button:hover {
+    color: $text-primary;
+}
 
-    .vector-mode-selector {
-        grid-template-columns: none;
-    }
+.phone-layout .zoom-controls {
+    flex: 0 0 auto;
+    margin: 0;
+}
 
-    .bitmap-mode-selector {
-        grid-template-columns: none;
-    }
+.phone-layout .viewport-controls {
+    display: flex;
+    overflow: hidden;
+    border-radius: calc($phone-control / 2);
+    background: $ui-background;
+    box-shadow: $floating-shadow;
+}
 
-    .controls-container {
-        width: 100%;
-        min-width: 0;
-        min-height: 0;
-        margin: $grid-unit 0 0;
-    }
+.phone-layout .viewport-controls .button-group-button,
+[dir="ltr"] .phone-layout .viewport-controls .button-group-button,
+[dir="rtl"] .phone-layout .viewport-controls .button-group-button {
+    display: inline-grid;
+    width: $phone-control;
+    height: $phone-control;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    place-items: center;
+}
 
-    .canvas-container {
-        min-width: 0;
-        border-radius: .5rem;
-        overflow: hidden;
-    }
+.phone-layout .button-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-    .canvas-controls {
-        height: 2.75rem;
-        margin-top: $grid-unit;
-        gap: $grid-unit;
-    }
+.phone-layout .tool-strip-panel {
+    display: block;
+    order: 2;
+    flex: 0 0 auto;
+    padding: $phone-gap;
+}
 
-    .bitmap-button {
-        min-width: 0;
-        min-height: 2.75rem;
-        flex: 0 1 auto;
-        padding: $grid-unit calc(2 * $grid-unit);
-    }
+.phone-layout .tool-strip-panel .mode-selector {
+    display: grid;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none;
+    position: static;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-template-rows: $phone-tool;
+    gap: $phone-gap;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
 
-    .zoom-controls {
-        flex: 0 0 auto;
-    }
+.shape-group {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+}
 
+.shape-group-button {
+    display: grid;
+    width: 100%;
+    height: $phone-tool;
+    padding: 0;
+    border: 0;
+    border-radius: .25rem;
+    place-items: center;
+    color: $text-primary;
+    background: transparent;
+    cursor: pointer;
+    touch-action: manipulation;
+}
 
-    .button-text {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+.shape-group-button.is-active {
+    color: white;
+    background: $motion-primary;
+}
 
-    .button-group-button {
-        display: inline-grid;
-        width: 2.75rem;
-        height: 2.75rem;
-        padding: 0;
-        place-items: center;
-    }
+.shape-popover {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + $phone-gap + .25rem);
+    z-index: 20;
+    display: none;
+    grid-auto-flow: column;
+    grid-auto-columns: $phone-tool;
+    grid-template-rows: $phone-tool;
+    gap: $phone-gap;
+    padding: $phone-gap;
+    border-radius: .75rem;
+    background: $ui-background;
+    box-shadow: $floating-shadow;
+}
 
+[dir="rtl"] .shape-popover {
+    right: auto;
+    left: 0;
+}
+
+.shape-popover.is-open {
+    display: grid;
 }
 
 .text-area {
