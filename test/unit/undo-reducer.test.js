@@ -1,6 +1,6 @@
 /* eslint-env jest */
 import undoReducer, {
-    undoSnapshot, undo, redo, clearUndoState, MAX_STACK_SIZE
+    undoSnapshot, undo, redo, clearUndoState, MAX_STACK_SIZE, restoreUndoState
 } from '../../src/reducers/undo';
 
 test('initialState', () => {
@@ -211,4 +211,15 @@ test('undoSnapshotAtMaxStackSize', () => {
     expect(reduxState.stack[0].state).toEqual(1);
     expect(reduxState.stack[MAX_STACK_SIZE - 2].state).toEqual(MAX_STACK_SIZE + 1); // Newest added state is at end
     expect(reduxState.stack[MAX_STACK_SIZE - 3].state).toEqual(MAX_STACK_SIZE - 2); // Old redo state is gone
+});
+
+test('restoreUndoState brings back a saved stack and its redo entries', () => {
+    const saved = {stack: [{id: 'a'}, {id: 'b'}, {id: 'c'}], pointer: 1};
+    const afterStroke = undoReducer(saved, undoSnapshot({id: 'stray'}));
+    expect(afterStroke.stack.map(item => item.id)).toEqual(['a', 'b', 'stray']);
+
+    const restored = undoReducer(afterStroke, restoreUndoState(saved));
+    expect(restored.stack).toBe(saved.stack);
+    expect(restored.pointer).toBe(1);
+    expect(undoReducer(afterStroke, restoreUndoState(null))).toBe(afterStroke);
 });

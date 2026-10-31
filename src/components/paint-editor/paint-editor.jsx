@@ -157,6 +157,16 @@ ShapeToolGroup.propTypes = {
     mode: PropTypes.string
 };
 
+const shapeGroup = (intl, mode, shapes) => (
+    <ShapeToolGroup
+        intl={intl}
+        key="shapes"
+        mode={mode}
+    >
+        {shapes}
+    </ShapeToolGroup>
+);
+
 const VectorTools = props => {
     const shapes = [
         <LineMode
@@ -190,38 +200,40 @@ const VectorTools = props => {
             onUpdateImage={props.onUpdateImage}
         />
     ];
+    const tools = [
+        <SelectMode
+            key="select"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <ReshapeMode
+            key="reshape"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <BrushMode
+            key="brush"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <EraserMode
+            key="eraser"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <PenMode
+            key="pen"
+            onUpdateSvg={props.onUpdateImage}
+        />,
+        <FillMode
+            key="fill"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <TextMode
+            key="text"
+            textArea={props.textArea}
+            onUpdateImage={props.onUpdateImage}
+        />
+    ].concat(props.phone ? [shapeGroup(props.intl, props.mode, shapes)] : shapes);
     return (
         <ResponsiveToolStrip modeSelectorClassName={styles.vectorModeSelector}>
-            <SelectMode
-                onUpdateImage={props.onUpdateImage}
-            />
-            <ReshapeMode
-                onUpdateImage={props.onUpdateImage}
-            />
-            <BrushMode
-                onUpdateImage={props.onUpdateImage}
-            />
-            <EraserMode
-                onUpdateImage={props.onUpdateImage}
-            />
-            <PenMode
-                onUpdateSvg={props.onUpdateImage}
-            />
-            <FillMode
-                onUpdateImage={props.onUpdateImage}
-            />
-            <TextMode
-                textArea={props.textArea}
-                onUpdateImage={props.onUpdateImage}
-            />
-            {props.phone ? (
-                <ShapeToolGroup
-                    intl={props.intl}
-                    mode={props.mode}
-                >
-                    {shapes}
-                </ShapeToolGroup>
-            ) : shapes}
+            {tools}
         </ResponsiveToolStrip>
     );
 };
@@ -241,34 +253,34 @@ const BitmapTools = props => {
             onUpdateImage={props.onUpdateImage}
         />
     ];
+    const tools = [
+        <BitBrushMode
+            key="brush"
+            onUpdateImage={props.onUpdateImage}
+        />
+    ].concat(props.phone ? [] : shapes, [
+        <TextMode
+            isBitmap
+            key="text"
+            textArea={props.textArea}
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <BitFillMode
+            key="fill"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <BitEraserMode
+            key="eraser"
+            onUpdateImage={props.onUpdateImage}
+        />,
+        <BitSelectMode
+            key="select"
+            onUpdateImage={props.onUpdateImage}
+        />
+    ], props.phone ? [shapeGroup(props.intl, props.mode, shapes)] : []);
     return (
         <ResponsiveToolStrip modeSelectorClassName={styles.bitmapModeSelector}>
-            <BitBrushMode
-                onUpdateImage={props.onUpdateImage}
-            />
-            {props.phone ? null : shapes}
-            <TextMode
-                isBitmap
-                textArea={props.textArea}
-                onUpdateImage={props.onUpdateImage}
-            />
-            <BitFillMode
-                onUpdateImage={props.onUpdateImage}
-            />
-            <BitEraserMode
-                onUpdateImage={props.onUpdateImage}
-            />
-            <BitSelectMode
-                onUpdateImage={props.onUpdateImage}
-            />
-            {props.phone ? (
-                <ShapeToolGroup
-                    intl={props.intl}
-                    mode={props.mode}
-                >
-                    {shapes}
-                </ShapeToolGroup>
-            ) : null}
+            {tools}
         </ResponsiveToolStrip>
     );
 };
@@ -409,6 +421,7 @@ const PaintEditorLayout = props => (
                     canvas={props.canvas}
                     hideScrollbars={props.isEyeDropping}
                     style={styles.canvasContainer}
+                    onRedo={props.onRedo}
                     onUndo={props.onUndo}
                 >
                     <PaperCanvas

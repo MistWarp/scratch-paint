@@ -4,6 +4,7 @@ const UNDO = 'scratch-paint/undo/UNDO';
 const REDO = 'scratch-paint/undo/REDO';
 const SNAPSHOT = 'scratch-paint/undo/SNAPSHOT';
 const CLEAR = 'scratch-paint/undo/CLEAR';
+const RESTORE = 'scratch-paint/undo/RESTORE';
 const MAX_STACK_SIZE = 100;
 const initialState = {
     stack: [],
@@ -51,6 +52,12 @@ const reducer = function (state, action) {
         };
     case CLEAR:
         return initialState;
+    case RESTORE:
+        if (!action.state || !Array.isArray(action.state.stack)) return state;
+        return {
+            stack: action.state.stack,
+            pointer: action.state.pointer
+        };
     default:
         return state;
     }
@@ -88,6 +95,12 @@ const clearUndoState = function () {
         type: CLEAR
     };
 };
+const restoreUndoState = function (state) {
+    return {
+        type: RESTORE,
+        state: state
+    };
+};
 
 export {
     reducer as default,
@@ -95,6 +108,7 @@ export {
     redo,
     undoSnapshot,
     clearUndoState,
+    restoreUndoState,
     MAX_STACK_SIZE,
     UNDO,
     REDO

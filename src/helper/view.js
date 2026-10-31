@@ -88,7 +88,12 @@ const setWorkspaceBounds = clipEmpty => {
     _workspaceBounds = new paper.Rectangle(left, top, right - left, bottom - top);
 };
 
+const ROTATION_EPSILON = 0.01;
+
+const isViewRotated = () => Math.abs(paper.project.view.rotation || 0) > ROTATION_EPSILON;
+
 const clampViewBounds = () => {
+    if (isViewRotated()) return;
     const {left, right, top, bottom} = paper.project.view.bounds;
     if (left < _workspaceBounds.left) {
         paper.project.view.scrollBy(new paper.Point(_workspaceBounds.left - left, 0));
@@ -155,6 +160,7 @@ const zoomOnSelection = deltaZoom => {
 };
 
 const resetZoom = () => {
+    if (isViewRotated()) paper.project.view.rotation = 0;
     paper.project.view.zoom = .5;
     setWorkspaceBounds(true /* clipEmpty */);
     resizeCrosshair();
@@ -240,6 +246,7 @@ export {
     resetZoom,
     setWorkspaceBounds,
     getWorkspaceBounds,
+    isViewRotated,
     resizeCrosshair,
     zoomOnSelection,
     zoomOnFixedPoint,

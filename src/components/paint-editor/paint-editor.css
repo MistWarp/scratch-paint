@@ -364,7 +364,8 @@ $floating-shadow: 0 2px 12px rgba(0, 0, 0, .2);
     left: auto;
 }
 
-.phone-context:empty {
+.phone-context:empty,
+.phone-context:not(:has(input, button, img, svg)) {
     display: none;
 }
 

@@ -5,14 +5,23 @@ import React from 'react';
 import {connect} from 'react-redux';
 import ScrollableCanvasComponent from '../components/scrollable-canvas/scrollable-canvas.jsx';
 
-import {clampViewBounds, pan, zoomOnFixedPoint, getWorkspaceBounds} from '../helper/view';
+import {
+    clampViewBounds, pan, getWorkspaceBounds, isViewRotated, OUTERMOST_ZOOM_LEVEL, resizeCrosshair, setWorkspaceBounds,
+    zoomOnFixedPoint
+} from '../helper/view';
 import {updateViewBounds} from '../reducers/view-bounds';
 import {redrawSelectionBox} from '../reducers/selected-items';
+import {restoreUndoState} from '../reducers/undo';
 
 import {getEventXY} from '../lib/touch-utils';
+import Modes from '../lib/modes';
 import bindAll from 'lodash.bindall';
 
 const MAX_GESTURE_ZOOM = 16;
+const ROTATION_SNAP = 4;
+const TAP_TIME = 260;
+const TAP_SLOP = 12;
+const COMMIT_ON_PRESS_MODES = [Modes.BIT_FILL];
 
 class ScrollableCanvas extends React.Component {
     static get ZOOM_INCREMENT () {
@@ -35,7 +44,10 @@ class ScrollableCanvas extends React.Component {
             'handleGestureMove',
             'handleGestureEnd',
             'handleStrokeStarted',
-            'handleStrokeEnded'
+            'handleStrokeEnded',
+            'handleTrackpadStart',
+            'handleTrackpadChange',
+            'handleTrackpadEnd'
         ]);
         this.gesture = null;
         this.stroke = null;
@@ -66,6 +78,9 @@ class ScrollableCanvas extends React.Component {
         canvas.addEventListener('touchstart', this.handleStrokeStarted);
         canvas.addEventListener('touchend', this.handleStrokeEnded);
         canvas.addEventListener('touchcancel', this.handleStrokeEnded);
+        canvas.addEventListener('gesturestart', this.handleTrackpadStart);
+        canvas.addEventListener('gesturechange', this.handleTrackpadChange);
+        canvas.addEventListener('gestureend', this.handleTrackpadEnd);
     }
     removeCanvasListeners (canvas) {
         canvas.removeEventListener('wheel', this.handleWheel);
@@ -74,6 +89,9 @@ class ScrollableCanvas extends React.Component {
         canvas.removeEventListener('touchstart', this.handleStrokeStarted);
         canvas.removeEventListener('touchend', this.handleStrokeEnded);
         canvas.removeEventListener('touchcancel', this.handleStrokeEnded);
+        canvas.removeEventListener('gesturestart', this.handleTrackpadStart);
+        canvas.removeEventListener('gesturechange', this.handleTrackpadChange);
+        canvas.removeEventListener('gestureend', this.handleTrackpadEnd);
     }
     undoTop () {
         const undoState = this.props.undoState;
@@ -90,6 +108,7 @@ class ScrollableCanvas extends React.Component {
         const own = this.ownTouches(event.touches);
         if (!this.gesture && own.length < 2) {
             this.strokePending = !this.stroke;
+            if (this.strokePending) this.undoBeforeStroke = this.props.undoState;
             return;
         }
         event.preventDefault();
@@ -106,7 +125,12 @@ class ScrollableCanvas extends React.Component {
     handleStrokeStarted () {
         if (!this.strokePending) return;
         this.strokePending = false;
-        this.stroke = {top: this.undoTop()};
+        const saved = COMMIT_ON_PRESS_MODES.indexOf(this.props.mode) === -1 ?
+            this.props.undoState : this.undoBeforeStroke;
+        this.stroke = {
+            saved,
+            top: saved ? saved.stack[saved.pointer] : null
+        };
     }
     handleStrokeEnded (event) {
         Array.prototype.forEach.call(event.changedTouches, touch => this.canvasTouches.delete(touch.identifier));
@@ -128,6 +152,7 @@ class ScrollableCanvas extends React.Component {
         setTimeout(() => {
             if (this.undoTop() !== stroke.top && this.props.onUndo) {
                 this.props.onUndo();
+                if (stroke.saved) this.props.restoreUndoState(stroke.saved);
             }
         });
     }
@@ -141,14 +166,83 @@ class ScrollableCanvas extends React.Component {
         }
         return new paper.Point((x / touches.length) - rect.left, (y / touches.length) - rect.top);
     }
+    placeView (center, anchor, zoom, rotation) {
+        const matrix = new paper.Matrix();
+        matrix.translate(center);
+        matrix.rotate(rotation);
+        matrix.scale(Math.max(OUTERMOST_ZOOM_LEVEL, Math.min(MAX_GESTURE_ZOOM, zoom)));
+        matrix.translate(anchor.negate());
+        paper.view.matrix = matrix;
+        setWorkspaceBounds(true);
+        clampViewBounds();
+        resizeCrosshair();
+    }
+    snapRotation (rotation) {
+        const normalized = ((rotation + 540) % 360) - 180;
+        return Math.abs(normalized) < ROTATION_SNAP ? 0 : normalized;
+    }
+    viewChanged () {
+        this.props.updateViewBounds(paper.view.matrix);
+        this.props.redrawSelectionBox();
+    }
+    canvasPoint (clientX, clientY) {
+        const rect = this.props.canvas.getBoundingClientRect();
+        return new paper.Point(clientX - rect.left, clientY - rect.top);
+    }
+    handleTrackpadStart (event) {
+        event.preventDefault();
+        if (this.gesture) return;
+        const center = this.canvasPoint(event.clientX, event.clientY);
+        this.trackpad = {
+            anchor: paper.view.viewToProject(center),
+            rotation: paper.view.rotation || 0,
+            zoom: paper.view.zoom
+        };
+    }
+    handleTrackpadChange (event) {
+        event.preventDefault();
+        if (this.gesture || !this.trackpad) return;
+        const center = this.canvasPoint(event.clientX, event.clientY);
+        this.placeView(center, this.trackpad.anchor, this.trackpad.zoom * event.scale,
+            this.snapRotation(this.trackpad.rotation + event.rotation));
+        this.viewChanged();
+    }
+    handleTrackpadEnd (event) {
+        event.preventDefault();
+        this.trackpad = null;
+    }
+    rotateAround (degrees, center) {
+        const now = Date.now();
+        if (!this.wheelRotation || now - this.wheelRotation.at > 400) {
+            this.wheelRotation = {target: paper.view.rotation || 0};
+        }
+        this.wheelRotation.at = now;
+        this.wheelRotation.target += degrees;
+        const anchor = paper.view.viewToProject(center);
+        this.placeView(center, anchor, paper.view.zoom, this.snapRotation(this.wheelRotation.target));
+        this.viewChanged();
+    }
     gestureSpread (touches) {
         if (touches.length < 2) return 0;
         return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
     }
+    gestureAngle (touches) {
+        if (touches.length < 2) return null;
+        return Math.atan2(touches[1].clientY - touches[0].clientY, touches[1].clientX - touches[0].clientX) *
+            180 / Math.PI;
+    }
     anchorGesture (touches) {
+        const center = this.gestureCenter(touches);
+        const previous = this.gesture;
         this.gesture = {
-            anchor: paper.view.viewToProject(this.gestureCenter(touches)),
+            anchor: paper.view.viewToProject(center),
+            angle: this.gestureAngle(touches),
+            center,
+            maxTouches: Math.max(touches.length, previous ? previous.maxTouches : 0),
+            moved: previous ? previous.moved : false,
+            rotation: paper.view.rotation || 0,
             spread: this.gestureSpread(touches),
+            startedAt: previous ? previous.startedAt : Date.now(),
             zoom: paper.view.zoom
         };
     }
@@ -158,19 +252,28 @@ class ScrollableCanvas extends React.Component {
         event.stopImmediatePropagation();
         const touches = this.ownTouches(event.touches);
         if (!touches.length) return;
+        const gesture = this.gesture;
         const center = this.gestureCenter(touches);
         const spread = this.gestureSpread(touches);
-        if (spread && this.gesture.spread) {
-            const zoom = Math.min(MAX_GESTURE_ZOOM, this.gesture.zoom * (spread / this.gesture.spread));
-            zoomOnFixedPoint(zoom - paper.view.zoom, paper.view.viewToProject(center));
+        const angle = this.gestureAngle(touches);
+        if (!gesture.moved && (center.getDistance(gesture.center) > TAP_SLOP ||
+                (spread && gesture.spread && Math.abs(spread - gesture.spread) > TAP_SLOP) ||
+                (angle !== null && gesture.angle !== null && Math.abs(angle - gesture.angle) > ROTATION_SNAP))) {
+            gesture.moved = true;
         }
-        const current = paper.view.viewToProject(center);
-        pan(this.gesture.anchor.x - current.x, this.gesture.anchor.y - current.y);
+        let zoom = gesture.zoom;
+        if (spread && gesture.spread) {
+            zoom = gesture.zoom * (spread / gesture.spread);
+        }
+        let rotation = gesture.rotation;
+        if (angle !== null && gesture.angle !== null) {
+            rotation = this.snapRotation(gesture.rotation + angle - gesture.angle);
+        }
+        this.placeView(center, gesture.anchor, zoom, rotation);
         if (!this.gestureFrame) {
             this.gestureFrame = requestAnimationFrame(() => {
                 this.gestureFrame = null;
-                this.props.updateViewBounds(paper.view.matrix);
-                this.props.redrawSelectionBox();
+                this.viewChanged();
             });
         }
     }
@@ -184,9 +287,14 @@ class ScrollableCanvas extends React.Component {
             this.anchorGesture(remaining);
             return;
         }
+        const gesture = this.gesture;
+        const tapped = !gesture.moved && Date.now() - gesture.startedAt < TAP_TIME;
         this.stopGesture();
-        this.props.updateViewBounds(paper.view.matrix);
-        this.props.redrawSelectionBox();
+        this.viewChanged();
+        if (tapped) {
+            const action = {2: this.props.onUndo, 3: this.props.onRedo}[gesture.maxTouches];
+            if (action) setTimeout(action);
+        }
     }
     stopGesture () {
         this.gesture = null;
@@ -284,6 +392,10 @@ class ScrollableCanvas extends React.Component {
         this.initialScreenY = null;
         event.preventDefault();
     }
+    screenToProjectDelta (dx, dy) {
+        return paper.view.viewToProject(new paper.Point(dx, dy))
+            .subtract(paper.view.viewToProject(new paper.Point(0, 0)));
+    }
     handleWheel (event) {
         // Multiplier variable, so that non-pixel-deltaModes are supported. Needed for Firefox.
         // See #529 (or LLK/scratch-blocks#1190).
@@ -301,17 +413,18 @@ class ScrollableCanvas extends React.Component {
             zoomOnFixedPoint(-deltaY / 500, fixedPoint);
             this.props.updateViewBounds(paper.view.matrix);
             this.props.redrawSelectionBox(); // Selection handles need to be resized after zoom
+        } else if (event.altKey) {
+            this.rotateAround((deltaY || deltaX) / 4, new paper.Point(offsetX, offsetY));
         } else if (event.shiftKey && event.deltaX === 0) {
             // Scroll horizontally (based on vertical scroll delta)
             // This is needed as for some browser/system combinations which do not set deltaX.
             // See #156.
-            const dx = deltaY / paper.view.zoom;
-            pan(dx, 0);
+            const delta = this.screenToProjectDelta(deltaY, 0);
+            pan(delta.x, delta.y);
             this.props.updateViewBounds(paper.view.matrix);
         } else {
-            const dx = deltaX / paper.view.zoom;
-            const dy = deltaY / paper.view.zoom;
-            pan(dx, dy);
+            const delta = this.screenToProjectDelta(deltaX, deltaY);
+            pan(delta.x, delta.y);
             this.props.updateViewBounds(paper.view.matrix);
             if (paper.tool) {
                 paper.tool.view._handleMouseEvent('mousemove', event, fixedPoint);
@@ -336,7 +449,7 @@ class ScrollableCanvas extends React.Component {
         }
         return (
             <ScrollableCanvasComponent
-                hideScrollbars={this.props.hideScrollbars}
+                hideScrollbars={this.props.hideScrollbars || (paper.project ? isViewRotated() : false)}
                 horizontalScrollLengthPercent={widthPercent}
                 horizontalScrollStartPercent={leftPercent}
                 style={this.props.style}
@@ -355,8 +468,11 @@ ScrollableCanvas.propTypes = {
     canvas: PropTypes.instanceOf(Element),
     children: PropTypes.node.isRequired,
     hideScrollbars: PropTypes.bool,
+    mode: PropTypes.string,
+    onRedo: PropTypes.func,
     onUndo: PropTypes.func,
     redrawSelectionBox: PropTypes.func.isRequired,
+    restoreUndoState: PropTypes.func.isRequired,
     style: PropTypes.string,
     undoState: PropTypes.shape({
         pointer: PropTypes.number,
@@ -366,12 +482,16 @@ ScrollableCanvas.propTypes = {
 };
 
 const mapStateToProps = state => ({
+    mode: state.scratchPaint.mode,
     undoState: state.scratchPaint.undo,
     viewBounds: state.scratchPaint.viewBounds
 });
 const mapDispatchToProps = dispatch => ({
     redrawSelectionBox: () => {
         dispatch(redrawSelectionBox());
+    },
+    restoreUndoState: state => {
+        dispatch(restoreUndoState(state));
     },
     updateViewBounds: matrix => {
         dispatch(updateViewBounds(matrix));
