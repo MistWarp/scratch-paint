@@ -422,6 +422,7 @@ const PaintEditorLayout = props => (
                     hideScrollbars={props.isEyeDropping}
                     style={styles.canvasContainer}
                     onRedo={props.onRedo}
+                    onRestoreUndo={props.onRestoreUndo}
                     onUndo={props.onUndo}
                 >
                     <PaperCanvas
@@ -605,6 +606,7 @@ const editorPropTypes = {
     onDismissNoiseNotice: PropTypes.func,
     onManageFonts: PropTypes.func,
     onRedo: PropTypes.func.isRequired,
+    onRestoreUndo: PropTypes.func,
     onSwitchToBitmap: PropTypes.func.isRequired,
     onSwitchToVector: PropTypes.func.isRequired,
     onUndo: PropTypes.func.isRequired,

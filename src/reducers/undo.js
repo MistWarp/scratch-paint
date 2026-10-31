@@ -95,10 +95,11 @@ const clearUndoState = function () {
         type: CLEAR
     };
 };
-const restoreUndoState = function (state) {
+const restoreUndoState = function (state, format) {
     return {
         type: RESTORE,
-        state: state
+        state: state,
+        format: format
     };
 };
 
@@ -111,5 +112,6 @@ export {
     restoreUndoState,
     MAX_STACK_SIZE,
     UNDO,
-    REDO
+    REDO,
+    RESTORE
 };

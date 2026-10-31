@@ -93,7 +93,13 @@ const ROTATION_EPSILON = 0.01;
 const isViewRotated = () => Math.abs(paper.project.view.rotation || 0) > ROTATION_EPSILON;
 
 const clampViewBounds = () => {
-    if (isViewRotated()) return;
+    if (isViewRotated()) {
+        const center = paper.project.view.center;
+        const x = Math.min(Math.max(center.x, _workspaceBounds.left), _workspaceBounds.right);
+        const y = Math.min(Math.max(center.y, _workspaceBounds.top), _workspaceBounds.bottom);
+        if (x !== center.x || y !== center.y) paper.project.view.center = new paper.Point(x, y);
+        return;
+    }
     const {left, right, top, bottom} = paper.project.view.bounds;
     if (left < _workspaceBounds.left) {
         paper.project.view.scrollBy(new paper.Point(_workspaceBounds.left - left, 0));

@@ -14,7 +14,7 @@ import {clearRaster, convertBackgroundGuideLayer, getRaster, setupLayers, update
 import {clearSelectedItems} from '../reducers/selected-items';
 import {
     ART_BOARD_WIDTH, ART_BOARD_HEIGHT, CENTER, MAX_WORKSPACE_BOUNDS,
-    clampViewBounds, resetZoom, setWorkspaceBounds, zoomToFit, resizeCrosshair
+    clampViewBounds, isViewRotated, resetZoom, setWorkspaceBounds, zoomToFit, resizeCrosshair
 } from '../helper/view';
 import {ensureClockwise, scaleWithStrokes} from '../helper/math';
 import {clearHoveredItem} from '../reducers/hover';
@@ -125,6 +125,7 @@ class PaperCanvas extends React.Component {
             }
             this.props.setZoomLevelId(newZoomLevelId);
         }
+        if (isViewRotated()) paper.view.rotation = 0;
         this.props.clearUndo();
         this.props.clearSelectedItems();
         this.props.clearHoveredItem();
@@ -205,6 +206,7 @@ class PaperCanvas extends React.Component {
     maybeZoomToFit (isBitmapMode) {
         if (this.shouldZoomToFit instanceof paper.Matrix) {
             paper.view.matrix = this.shouldZoomToFit;
+            if (isViewRotated()) paper.view.rotation = 0;
             setWorkspaceBounds(true);
             clampViewBounds();
             this.props.updateViewBounds(paper.view.matrix);

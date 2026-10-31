@@ -1,6 +1,6 @@
 import Formats from '../lib/format';
 import log from '../log/log';
-import {UNDO, REDO} from './undo';
+import {UNDO, REDO, RESTORE} from './undo';
 
 const CHANGE_FORMAT = 'scratch-paint/formats/CHANGE_FORMAT';
 const initialState = null;
@@ -11,6 +11,8 @@ const reducer = function (state, action) {
     case UNDO:
         /* falls through */
     case REDO:
+        /* falls through */
+    case RESTORE:
         /* falls through */
     case CHANGE_FORMAT:
         if (!action.format) return state;
