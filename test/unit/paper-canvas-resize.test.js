@@ -89,4 +89,21 @@ describe('PaperCanvas sizing', () => {
         expect(paper.view.viewSize.width).toBe(901);
         expect(paper.view.viewSize.height).toBe(700);
     });
+
+    test('a canvas that shrinks keeps the art centered', () => {
+        jest.useFakeTimers();
+        setViewSize(400, 700);
+        resetZoom();
+        paper.view.zoom = 1;
+        paper.view.center = new paper.Point(CENTER.x, CENTER.y);
+        jest.spyOn(paper.DomElement, 'getSize').mockReturnValue(new paper.Size(400, 300));
+
+        makeCanvas().onCanvasResize();
+        jest.runAllTimers();
+        jest.useRealTimers();
+
+        expect(paper.view.viewSize.height).toBe(300);
+        expect(paper.view.center.x).toBeCloseTo(CENTER.x);
+        expect(paper.view.center.y).toBeCloseTo(CENTER.y);
+    });
 });
