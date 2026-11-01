@@ -16,7 +16,7 @@ scratch-paint is the costume and backdrop editor embedded in MistWarp's editor: 
 
 ## Checks
 
-`npm run lint` (note that it runs with `--fix`), `npm run unit`, `NODE_ENV=production npm run build`, and `npm run check:conventions`, which rejects code comments and em dashes in the lines you add. Visible changes need screenshots, plus a recording for interaction, in the PR.
+Install with `npm ci --legacy-peer-deps` (an old ESLint config has a peer conflict). CI runs `npm run unit` and the production build (`NODE_ENV=production npm run build`, which needs `NODE_OPTIONS=--openssl-legacy-provider` on Node 17+), plus `npm run check:conventions` on pull requests, which rejects code comments and em dashes in the lines you add. `npm run lint` runs with `--fix` and the existing code still has lint errors, so lint the files you touch rather than the whole repo. Visible changes need screenshots, plus a recording for interaction, in the PR.
 
 ## Working here
 
