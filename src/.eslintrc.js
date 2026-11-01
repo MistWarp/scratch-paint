@@ -5,6 +5,7 @@ module.exports = {
         browser: true
     },
     rules: {
+        'require-jsdoc': 'off',
         'import/no-mutable-exports': 'error',
         'import/no-commonjs': 'error',
         'import/no-amd': 'error',
