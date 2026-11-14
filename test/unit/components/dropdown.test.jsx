@@ -44,9 +44,10 @@ describe('Dropdown keyboard use', () => {
 
     const openWithKey = key => {
         trigger().focus();
-        wrapper.find('[aria-haspopup]').simulate('keydown', {key});
+        const event = press(key);
         jest.runOnlyPendingTimers();
         wrapper.update();
+        return event;
     };
 
     beforeEach(() => {
@@ -84,6 +85,20 @@ describe('Dropdown keyboard use', () => {
         mountMenu();
         openWithKey('a');
         expect(trigger().getAttribute('aria-expanded')).toBe('false');
+    });
+
+    test('the key that opens the menu does not reach the canvas', () => {
+        mountMenu();
+        const onDocumentKey = jest.fn();
+        document.addEventListener('keydown', onDocumentKey);
+        const event = openWithKey('ArrowDown');
+        expect(event.defaultPrevented).toBe(true);
+        expect(onDocumentKey).not.toHaveBeenCalled();
+        trigger().blur();
+        press('Escape');
+        openWithKey('a');
+        expect(onDocumentKey).toHaveBeenCalledTimes(1);
+        document.removeEventListener('keydown', onDocumentKey);
     });
 
     test('arrow keys move between the items that can be used', () => {

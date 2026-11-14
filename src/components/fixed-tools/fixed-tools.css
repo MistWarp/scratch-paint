@@ -124,6 +124,10 @@ $border-radius: 0.25rem;
     background-color: transparent;
 }
 
+.mod-context-menu .mod-menu-item:focus-visible {
+    outline-offset: -2px;
+}
+
 .menu-item-icon {
     margin-right: calc(2 * $grid-unit);
 }

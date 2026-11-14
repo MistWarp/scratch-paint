@@ -20,6 +20,10 @@
     color: white;
 }
 
+.font-context-menu .mod-menu-item:focus-visible {
+    outline-offset: -2px;
+}
+
 .mod-context-menu {
     display: flex;
     flex-direction: column;

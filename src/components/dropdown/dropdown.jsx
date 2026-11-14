@@ -95,6 +95,7 @@ class Dropdown extends React.Component {
         if (this.state.isOpen || event.target !== event.currentTarget) return;
         if (!OPEN_KEYS.includes(event.key)) return;
         event.preventDefault();
+        event.stopPropagation();
         this.handleToggleOpenState();
         this.focusTimer = setTimeout(() => this.moveFocus('Home'), 0);
     }
@@ -130,7 +131,9 @@ class Dropdown extends React.Component {
         this.popover = popover;
     }
     setTrigger (trigger) {
+        if (this.trigger) this.trigger.removeEventListener('keydown', this.handleKeyDown);
         this.trigger = trigger;
+        if (trigger) trigger.addEventListener('keydown', this.handleKeyDown);
     }
     render () {
         return (
@@ -154,7 +157,6 @@ class Dropdown extends React.Component {
                     role="button"
                     tabIndex={0}
                     onClick={this.handleToggleOpenState}
-                    onKeyDown={this.handleKeyDown}
                 >
                     {this.props.children}
                     <DropdownIcon

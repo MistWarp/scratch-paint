@@ -156,6 +156,10 @@ $border-radius: 0.25rem;
     background: $motion-transparent;
 }
 
+.mod-context-menu .mod-menu-item:focus-visible {
+    outline-offset: -2px;
+}
+
 .mod-top-divider {
     border-top: 1px solid $ui-pane-border;
 }
