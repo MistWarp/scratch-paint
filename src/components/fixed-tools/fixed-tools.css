@@ -95,7 +95,8 @@ $border-radius: 0.25rem;
     flex-direction: column;
 }
 
-.mod-top-divider {
+.mod-top-divider,
+.mobile-menu-divider {
     border-top: 1px solid $ui-pane-border;
 }
 
@@ -251,10 +252,6 @@ $mobile-gap: .375rem;
 
     .mod-dashed-border {
         display: none;
-    }
-
-    .mobile-menu-divider {
-        border-top: 1px solid $ui-pane-border;
     }
 
     .mod-menu-item {

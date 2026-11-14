@@ -58,6 +58,11 @@ $arrow-border-width: 14px;
         background: $ui-soft-strong;
     }
 
+    .dropdown:focus-visible {
+        outline: 2px solid $motion-primary;
+        outline-offset: 1px;
+    }
+
     .dropdown-icon,
     [dir="ltr"] .dropdown-icon,
     [dir="rtl"] .dropdown-icon {

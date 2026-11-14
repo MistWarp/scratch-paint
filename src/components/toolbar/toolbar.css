@@ -68,8 +68,10 @@
     filter: brightness(1.7);
 }
 
-[data-ui-theme="dark"] img.icon {
-    filter: brightness(0) invert(.93);
+@media not all and (max-width: 600px) {
+    [data-ui-theme="dark"] img.icon {
+        filter: brightness(0) invert(.93);
+    }
 }
 
 .button.is-active img.icon {
