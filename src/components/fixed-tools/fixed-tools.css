@@ -162,6 +162,40 @@ $border-radius: 0.25rem;
     box-sizing: border-box;
 }
 
+$arrange-as-menu: 43.49rem;
+$arrange-in-main-row: 35.74rem;
+
+.arrange-buttons {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.arrange-menu,
+.arrange-menu-narrow {
+    display: none;
+}
+
+@container paint-editor (max-width: $arrange-as-menu) {
+    .arrange-buttons {
+        display: none;
+    }
+
+    .arrange-menu {
+        display: flex;
+    }
+}
+
+@container paint-editor (max-width: $arrange-in-main-row) {
+    .arrange-menu {
+        display: none;
+    }
+
+    .arrange-menu-narrow {
+        display: flex;
+    }
+}
+
 $mobile-gap: .375rem;
 
 @media only screen and (max-width: 600px) {

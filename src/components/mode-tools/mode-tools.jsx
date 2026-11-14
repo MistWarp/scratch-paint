@@ -959,7 +959,7 @@ const DesktopModeTools = props => {
                     messages.spokeRatio,
                     props.trianglePointValue,
                     props.onPointCountSliderChange,
-                    {min: 0.01, max: 1000, step: 0.1}
+                    {min: 0, max: 1000, step: 0.1}
                 )}
             </React.Fragment>
         );

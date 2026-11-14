@@ -169,6 +169,40 @@ const arrangeActions = props => [
     }
 ];
 
+const ArrangeMenu = props => (
+    <Dropdown
+        className={styles.modUnselect}
+        enterExitTransitionDurationMs={20}
+        popoverContent={
+            <InputGroup
+                className={styles.modContextMenu}
+                rtl={props.rtl}
+            >
+                {arrangeActions(props).map(action => (
+                    <Button
+                        className={classNames(styles.modMenuItem, {
+                            [styles.mobileMenuDivider]: action.key === 'front',
+                            [styles.modDisabled]: !action.enabled
+                        })}
+                        disabled={!action.enabled}
+                        key={action.key}
+                        onClick={action.handleClick}
+                    >
+                        <action.icon
+                            className={styles.menuItemIcon}
+                            draggable={false}
+                        />
+                        <span>{props.intl.formatMessage(action.message)}</span>
+                    </Button>
+                ))}
+            </InputGroup>
+        }
+        tipSize={.01}
+    >
+        {props.intl.formatMessage(messages.arrange)}
+    </Dropdown>
+);
+
 const PhoneFixedTools = props => (
     <div className={styles.row}>
         <InputGroup>
@@ -182,37 +216,7 @@ const PhoneFixedTools = props => (
         <UndoRedoPhone {...props} />
         {isVector(props.format) ? (
             <InputGroup>
-                <Dropdown
-                    className={styles.modUnselect}
-                    enterExitTransitionDurationMs={20}
-                    popoverContent={
-                        <InputGroup
-                            className={styles.modContextMenu}
-                            rtl={props.rtl}
-                        >
-                            {arrangeActions(props).map(action => (
-                                <Button
-                                    className={classNames(styles.modMenuItem, {
-                                        [styles.mobileMenuDivider]: action.key === 'front',
-                                        [styles.modDisabled]: !action.enabled
-                                    })}
-                                    disabled={!action.enabled}
-                                    key={action.key}
-                                    onClick={action.handleClick}
-                                >
-                                    <action.icon
-                                        className={styles.menuItemIcon}
-                                        draggable={false}
-                                    />
-                                    <span>{props.intl.formatMessage(action.message)}</span>
-                                </Button>
-                            ))}
-                        </InputGroup>
-                    }
-                    tipSize={.01}
-                >
-                    {props.intl.formatMessage(messages.arrange)}
-                </Dropdown>
+                <ArrangeMenu {...props} />
             </InputGroup>
         ) : null}
     </div>
@@ -263,15 +267,30 @@ const ArrangeTools = props => {
     const buttons = arrangeActions(props).map(action => arrangeButton(props.intl, action));
     return (
         <React.Fragment>
-            <ToolbarGroup>{buttons.slice(0, 2)}</ToolbarGroup>
-            <ToolbarGroup>{buttons.slice(2)}</ToolbarGroup>
+            <div className={styles.arrangeButtons}>
+                <ToolbarGroup>{buttons.slice(0, 2)}</ToolbarGroup>
+                <ToolbarGroup>{buttons.slice(2)}</ToolbarGroup>
+            </div>
+            <div className={styles.arrangeMenu}>
+                <ArrangeMenu {...props} />
+            </div>
         </React.Fragment>
+    );
+};
+
+const NarrowArrangeMenu = props => {
+    if (!isVector(props.format)) return null;
+    return (
+        <div className={styles.arrangeMenuNarrow}>
+            <ArrangeMenu {...props} />
+        </div>
     );
 };
 
 const FixedToolsComponent = props => {
     if (props.phone) return <PhoneFixedTools {...props} />;
     if (props.section === 'arrange') return <ArrangeTools {...props} />;
+    if (props.section === 'arrangeNarrow') return <NarrowArrangeMenu {...props} />;
     return <DocumentTools {...props} />;
 };
 
@@ -292,7 +311,7 @@ FixedToolsComponent.propTypes = {
     onUpdateName: PropTypes.func.isRequired,
     phone: PropTypes.bool,
     rtl: PropTypes.bool.isRequired,
-    section: PropTypes.oneOf(['document', 'arrange'])
+    section: PropTypes.oneOf(['document', 'arrange', 'arrangeNarrow'])
 };
 
 FixedToolsComponent.defaultProps = {
@@ -304,6 +323,8 @@ UndoRedoPhone.propTypes = FixedToolsComponent.propTypes;
 PhoneFixedTools.propTypes = FixedToolsComponent.propTypes;
 DocumentTools.propTypes = FixedToolsComponent.propTypes;
 ArrangeTools.propTypes = FixedToolsComponent.propTypes;
+ArrangeMenu.propTypes = FixedToolsComponent.propTypes;
+NarrowArrangeMenu.propTypes = FixedToolsComponent.propTypes;
 
 const mapStateToProps = state => ({
     format: state.scratchPaint.format,

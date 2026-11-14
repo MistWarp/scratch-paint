@@ -245,14 +245,18 @@ $border-radius: 0.25rem;
 
 $control: 2.25rem;
 $tool: 2.5rem;
-$tool-min: 1.75rem;
+$tool-min: 2rem;
 $one-row-header: 82rem;
+$short-rail: 24rem;
 
 .desktop-layout {
     container: paint-editor / inline-size;
     gap: .625rem;
+    box-sizing: border-box;
     padding: .75rem;
+    overflow: hidden auto;
     color: $text-primary;
+    scrollbar-width: thin;
 }
 
 .editor-container-top {
@@ -306,8 +310,9 @@ $one-row-header: 82rem;
 }
 
 .desktop-layout .top-align-row {
+    container: paint-tools / size;
     min-width: 0;
-    min-height: 0;
+    min-height: 13rem;
     height: auto;
     flex: 1 1 auto;
     gap: .625rem;
@@ -368,6 +373,24 @@ $one-row-header: 82rem;
     background: $motion-primary;
 }
 
+@container paint-tools (max-height: $short-rail) {
+    .desktop-layout .mode-selector {
+        display: grid;
+        width: calc(2 * $tool + 8px);
+        grid-template-columns: repeat(2, $tool);
+        grid-auto-rows: minmax($tool-min, $tool);
+        align-content: start;
+    }
+
+    .desktop-layout .shape-group {
+        grid-column: 1 / -1;
+    }
+
+    .desktop-layout .shape-group-button {
+        width: 100%;
+    }
+}
+
 .desktop-layout[dir] .shape-popover {
     top: auto;
     right: auto;
@@ -390,6 +413,7 @@ $one-row-header: 82rem;
 .desktop-layout .canvas-controls {
     height: auto;
     min-height: $control;
+    flex-wrap: wrap;
     margin-top: .625rem;
     align-items: center;
     gap: .5rem .75rem;

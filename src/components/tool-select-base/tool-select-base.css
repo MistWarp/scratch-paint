@@ -50,7 +50,7 @@ img.tool-select-icon {
         position: relative;
         display: grid;
         width: 2.5rem;
-        min-height: 1.75rem;
+        min-height: 2rem;
         flex: 0 1 2.5rem;
         box-sizing: border-box;
         margin: 0;

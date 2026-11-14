@@ -387,6 +387,10 @@ const DesktopTop = props => (
     <div className={styles.editorContainerTop}>
         <div className={styles.headerMain}>
             <FixedTools {...props} />
+            <FixedTools
+                {...props}
+                section="arrangeNarrow"
+            />
             <div className={styles.headerColors}>
                 <FillColorIndicatorComponent
                     onUpdateImage={props.onUpdateImage}

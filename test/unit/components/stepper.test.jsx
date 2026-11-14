@@ -1,4 +1,4 @@
-/* eslint-env jest */
+/* eslint-env jest, browser */
 import React from 'react'; // eslint-disable-line no-unused-vars
 import {mount} from 'enzyme';
 import {IntlProvider} from 'react-intl'; // eslint-disable-line no-unused-vars
@@ -16,7 +16,7 @@ const mountStepper = props => mount(
 
 const press = button => button.simulate('pointerdown', {pointerType: 'mouse', button: 0});
 
-class Field extends React.Component {
+class Field extends React.Component { // eslint-disable-line no-unused-vars
     constructor (props) {
         super(props);
         this.state = {value: props.value, disabled: false};
