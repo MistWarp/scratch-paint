@@ -45,7 +45,7 @@ img.tool-select-icon {
     display: none;
 }
 
-@media only screen and (min-width: 601px) {
+@media not all and (max-width: 600px) {
     .mod-tool-select {
         position: relative;
         display: grid;
@@ -62,6 +62,11 @@ img.tool-select-icon {
 
     .mod-tool-select:hover {
         background: $accent-soft;
+    }
+
+    .mod-tool-select:focus-visible {
+        outline: 2px solid $motion-primary;
+        outline-offset: 1px;
     }
 
     .mod-tool-select.is-selected,

@@ -19,7 +19,7 @@ const messages = defineMessages({
 
 const LiveInput = LiveInputHOC(Input);
 const StrokeWidthIndicatorComponent = props => (
-    <InputGroup disabled={props.disabled}>
+    <InputGroup disabled={props.disabled && !props.stepper}>
         {props.stepper ? (
             <Stepper
                 disabled={props.disabled}

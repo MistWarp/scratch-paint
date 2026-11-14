@@ -357,17 +357,21 @@ $one-row-header: 82rem;
     background: $accent-soft;
 }
 
+.desktop-layout .shape-group-button:focus-visible {
+    outline: 2px solid $motion-primary;
+    outline-offset: 1px;
+}
+
 .desktop-layout .shape-group-button.is-active,
 .desktop-layout .shape-group-button.is-active:hover {
     color: $accent-foreground;
     background: $motion-primary;
 }
 
-.desktop-layout .shape-popover,
-[dir="rtl"] .desktop-layout .shape-popover {
-    top: 50%;
+.desktop-layout[dir] .shape-popover {
+    top: auto;
     right: auto;
-    bottom: auto;
+    bottom: -3px;
     left: calc(100% + 3px + .25rem);
     grid-auto-flow: row;
     grid-auto-rows: $tool;
@@ -375,10 +379,10 @@ $one-row-header: 82rem;
     grid-template-columns: $tool;
     gap: 2px;
     padding: 3px;
-    transform: translateY(-50%);
+    transform: none;
 }
 
-[dir="rtl"] .desktop-layout .shape-popover {
+.desktop-layout[dir="rtl"] .shape-popover {
     right: calc(100% + 3px + .25rem);
     left: auto;
 }
@@ -445,9 +449,7 @@ $one-row-header: 82rem;
     background: $ui-soft;
 }
 
-.desktop-layout .viewport-controls .button-group-button,
-[dir="ltr"] .desktop-layout .viewport-controls .button-group-button,
-[dir="rtl"] .desktop-layout .viewport-controls .button-group-button {
+.desktop-layout[dir] .viewport-controls .button-group-button {
     display: inline-flex;
     min-width: 2rem;
     height: 2rem;
@@ -470,7 +472,7 @@ $one-row-header: 82rem;
     height: 1.125rem;
 }
 
-[dir] .desktop-layout .viewport-controls .zoom-readout {
+.desktop-layout[dir] .viewport-controls .zoom-readout {
     min-width: 3.25rem;
     padding: 0 .25rem;
     font-size: .75rem;

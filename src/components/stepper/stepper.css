@@ -13,8 +13,12 @@
 }
 
 .stepper.is-disabled {
-    opacity: .35;
+    opacity: .4;
     pointer-events: none;
+}
+
+.stepper.is-disabled .step:disabled {
+    opacity: 1;
 }
 
 .step {

@@ -109,8 +109,33 @@ const messages = defineMessages({
     },
     zoomActual: {
         defaultMessage: 'Zoom to 100%',
-        description: 'Label for the zoom percentage button, which resets the zoom to actual size',
+        description: 'Tooltip for the zoom percentage button, which resets the zoom to actual size',
         id: 'paint.paintEditor.zoomActual'
+    },
+    zoomActualFrom: {
+        defaultMessage: 'Zoom is {percent}%. Zoom to 100%',
+        description: 'Screen reader label for the zoom percentage button, which resets the zoom to actual size',
+        id: 'paint.paintEditor.zoomActualFrom'
+    },
+    zoomIn: {
+        defaultMessage: 'Zoom in',
+        description: 'Label for the button that zooms the canvas in',
+        id: 'paint.paintEditor.zoomIn'
+    },
+    zoomOut: {
+        defaultMessage: 'Zoom out',
+        description: 'Label for the button that zooms the canvas out',
+        id: 'paint.paintEditor.zoomOut'
+    },
+    fitArtwork: {
+        defaultMessage: 'Fit artwork',
+        description: 'Label for the button that zooms the canvas so the whole drawing is visible',
+        id: 'paint.paintEditor.fitArtwork'
+    },
+    canvasTheme: {
+        defaultMessage: 'Canvas theme',
+        description: 'Label for the button that switches the canvas between light and dark backgrounds',
+        id: 'paint.paintEditor.canvasTheme'
     }
 });
 
@@ -122,8 +147,6 @@ const PHONE_SHAPE_MODES = [
 ];
 
 const MORE_SHAPE_MODES = [Modes.ROUNDED_RECT, Modes.TRIANGLE, Modes.SUSSY, Modes.ARROW];
-
-const ARRANGE_MODES = [Modes.SELECT, Modes.RESHAPE];
 
 const ResponsiveToolStrip = props => (
     <div className={styles.toolStripPanel}>
@@ -145,8 +168,15 @@ const ShapeToolGroup = props => {
         const close = event => {
             if (group.current && !group.current.contains(event.target)) setOpen(false);
         };
+        const closeOnEscape = event => {
+            if (event.key === 'Escape') setOpen(false);
+        };
         document.addEventListener('pointerdown', close);
-        return () => document.removeEventListener('pointerdown', close);
+        document.addEventListener('keydown', closeOnEscape);
+        return () => {
+            document.removeEventListener('pointerdown', close);
+            document.removeEventListener('keydown', closeOnEscape);
+        };
     }, [open]);
     const active = props.modes.indexOf(props.mode) !== -1;
     const label = props.intl.formatMessage(props.label);
@@ -375,16 +405,13 @@ const DesktopTop = props => (
             </div>
         </div>
         <div className={styles.headerContext}>
-            {isVector(props.format) && ARRANGE_MODES.indexOf(props.mode) !== -1 ? (
+            {isVector(props.format) ? (
                 <FixedTools
                     {...props}
                     section="arrange"
                 />
             ) : null}
-            <ModeTools
-                {...props}
-                groupClassName={styles.modModeTools}
-            />
+            <ModeTools {...props} />
         </div>
     </div>
 );
@@ -500,11 +527,12 @@ const PhoneContextBar = props => (
 );
 
 const ZoomControls = props => {
+    const text = (message, values) => props.intl.formatMessage(message, values);
     const fit = (
         <Button
-            aria-label="Fit artwork"
+            aria-label={text(messages.fitArtwork)}
             className={styles.buttonGroupButton}
-            title="Fit artwork"
+            title={text(messages.fitArtwork)}
             onClick={props.onZoomReset}
         >
             <Scan
@@ -517,47 +545,47 @@ const ZoomControls = props => {
         <InputGroup className={styles.zoomControls}>
             <ButtonGroup className={styles.viewportControls}>
                 <Button
-                    aria-label="Canvas theme"
+                    aria-label={text(messages.canvasTheme)}
                     className={styles.buttonGroupButton}
-                    title="Canvas theme"
+                    title={text(messages.canvasTheme)}
                     onClick={props.onChangeTheme}
                 >
                     <Palette
-                        alt="Change theme"
+                        aria-hidden
                         className={styles.buttonGroupButtonIcon}
                         draggable={false}
                     />
                 </Button>
                 <Button
-                    aria-label="Zoom out"
+                    aria-label={text(messages.zoomOut)}
                     className={classNames(styles.buttonGroupButton, styles.zoomStepButton)}
-                    title="Zoom out"
+                    title={text(messages.zoomOut)}
                     onClick={props.onZoomOut}
                 >
                     <ZoomOut
-                        alt="Zoom Out"
+                        aria-hidden
                         className={styles.buttonGroupButtonIcon}
                         draggable={false}
                     />
                 </Button>
                 {props.phone ? fit : (
                     <Button
-                        aria-label={props.intl.formatMessage(messages.zoomActual)}
+                        aria-label={text(messages.zoomActualFrom, {percent: props.zoomPercent})}
                         className={classNames(styles.buttonGroupButton, styles.zoomReadout)}
-                        title={props.intl.formatMessage(messages.zoomActual)}
+                        title={text(messages.zoomActual)}
                         onClick={props.onZoomActual}
                     >
                         {`${props.zoomPercent}%`}
                     </Button>
                 )}
                 <Button
-                    aria-label="Zoom in"
+                    aria-label={text(messages.zoomIn)}
                     className={classNames(styles.buttonGroupButton, styles.zoomStepButton)}
-                    title="Zoom in"
+                    title={text(messages.zoomIn)}
                     onClick={props.onZoomIn}
                 >
                     <ZoomIn
-                        alt="Zoom In"
+                        aria-hidden
                         className={styles.buttonGroupButtonIcon}
                         draggable={false}
                     />

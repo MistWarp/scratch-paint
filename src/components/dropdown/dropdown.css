@@ -36,7 +36,7 @@ $arrow-border-width: 14px;
     padding-top: .2rem;
 }
 
-@media only screen and (min-width: 601px) {
+@media not all and (max-width: 600px) {
     .dropdown {
         display: inline-flex;
         height: 2.25rem;

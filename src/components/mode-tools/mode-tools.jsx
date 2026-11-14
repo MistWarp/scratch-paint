@@ -236,7 +236,7 @@ const messages = defineMessages({
         id: 'pm.paint.modeTools.centerAlign'
     },
     arrowTip: {
-        defaultMessage: 'Hold Alt + Shift to resize the arrow tip',
+        defaultMessage: 'Hold Alt + Shift to resize arrow tip',
         description: 'Hint shown while the arrow tool is selected',
         id: 'paint.modeTools.arrowTip'
     },
@@ -959,7 +959,7 @@ const DesktopModeTools = props => {
                     messages.spokeRatio,
                     props.trianglePointValue,
                     props.onPointCountSliderChange,
-                    {min: 0, max: 1000, step: 0.1}
+                    {min: 0.01, max: 1000, step: 0.1}
                 )}
             </React.Fragment>
         );

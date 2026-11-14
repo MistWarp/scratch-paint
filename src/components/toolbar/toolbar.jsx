@@ -22,7 +22,7 @@ const ToolbarGroup = props => (
     <div
         aria-label={props.label}
         className={classNames(styles.group, props.className)}
-        role="group"
+        role={props.label ? 'group' : null}
     >
         {props.children}
     </div>

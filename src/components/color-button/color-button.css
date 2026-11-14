@@ -77,7 +77,7 @@
     z-index: 1;
 }
 
-@media only screen and (min-width: 601px) {
+@media not all and (max-width: 600px) {
     .color-button {
         width: calc(3rem + 6px);
         height: 2.25rem;
@@ -88,6 +88,11 @@
         border-radius: .625rem;
         background: $ui-soft;
         cursor: pointer;
+    }
+
+    .color-button:focus-visible {
+        outline: 2px solid $motion-primary;
+        outline-offset: 1px;
     }
 
     .color-button-swatch,
