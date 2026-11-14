@@ -150,7 +150,10 @@ class Dropdown extends React.Component {
         if (moves) {
             this.moveFocus(event.key);
         } else if (activates && inMenu) {
-            if (isEnabled(active)) active.click();
+            if (isEnabled(active)) {
+                active.dispatchEvent(new FocusEvent('focus'));
+                active.click();
+            }
             if (!this.state.isOpen) this.trigger.focus({preventScroll: true});
         } else {
             this.dismiss(event);

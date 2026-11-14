@@ -142,6 +142,32 @@ describe('Dropdown', () => {
             expect(onDocumentKey).not.toHaveBeenCalled();
         });
 
+        test('running an item previews it first, whatever the pointer last hovered', () => {
+            const calls = [];
+            const onFocus = jest.fn(() => calls.push('focus'));
+            const onMouseOver = jest.fn(() => calls.push('hover'));
+            const onClick = jest.fn(() => calls.push('click'));
+            wrapper = mount(
+                <Dropdown
+                    enterExitTransitionDurationMs={0}
+                    popoverContent={
+                        <Button
+                            onClick={onClick}
+                            onFocus={onFocus}
+                            onMouseOver={onMouseOver}
+                        >{'Serif'}</Button>
+                    }
+                >
+                    {'Font'}
+                </Dropdown>,
+                {attachTo: host}
+            );
+            openWithKey('Enter');
+            document.activeElement.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
+            press('Enter');
+            expect(calls).toEqual(['focus', 'hover', 'focus', 'click']);
+        });
+
         test('a key held down to open the menu does not run or pass its first item', () => {
             mountMenu();
             openWithKey('Enter');
