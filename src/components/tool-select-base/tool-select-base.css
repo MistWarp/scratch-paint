@@ -81,6 +81,10 @@ img.tool-select-icon {
         color: $text-primary;
     }
 
+    [data-ui-theme="dark"] img.tool-select-icon {
+        filter: brightness(0) invert(.93);
+    }
+
     .key-hint {
         position: absolute;
         right: .25rem;

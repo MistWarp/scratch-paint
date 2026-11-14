@@ -604,6 +604,7 @@ const PaintEditorLayout = props => (
         })}
         dir={props.rtl ? 'rtl' : 'ltr'}
         data-paint-theme={props.theme}
+        data-ui-theme={props.uiTheme}
     >
         {props.canvas !== null ? ( // eslint-disable-line no-negated-condition
             props.phone ? <PhoneTop {...props} /> : <DesktopTop {...props} />
@@ -747,6 +748,7 @@ const editorPropTypes = {
     showRoundedRectMode: PropTypes.bool,
     textArea: PropTypes.instanceOf(Element),
     theme: PropTypes.string,
+    uiTheme: PropTypes.string,
     width: PropTypes.number,
     height: PropTypes.number,
     zoomLevelId: PropTypes.string,
