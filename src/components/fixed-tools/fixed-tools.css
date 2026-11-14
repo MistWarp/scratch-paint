@@ -132,6 +132,36 @@ $border-radius: 0.25rem;
     margin-left: calc(2 * $grid-unit);
 }
 
+.document-tools {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: .75rem;
+}
+
+.name-field {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: .5rem;
+    margin: 0;
+}
+
+.name-label {
+    color: $text-secondary;
+    font-size: .75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.document-tools .costume-input {
+    width: 8rem;
+    min-width: 4rem;
+    height: 2.25rem;
+    box-sizing: border-box;
+}
+
 $mobile-gap: .375rem;
 
 @media only screen and (max-width: 600px) {

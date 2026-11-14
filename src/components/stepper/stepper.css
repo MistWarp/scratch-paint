@@ -1,0 +1,80 @@
+@import "../../css/colors.css";
+
+.stepper {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 2px;
+    height: 2.25rem;
+    box-sizing: border-box;
+    padding: 2px;
+    border-radius: .625rem;
+    background: $ui-soft;
+}
+
+.stepper.is-disabled {
+    opacity: .35;
+    pointer-events: none;
+}
+
+.step {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 1.625rem;
+    height: 2rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: .5rem;
+    background: transparent;
+    color: $text-primary;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+}
+
+.step:hover:not(:disabled) {
+    background: $accent-soft;
+    color: $accent-text;
+}
+
+.step:disabled {
+    opacity: .35;
+    cursor: default;
+}
+
+.step-icon {
+    display: block;
+    width: .875rem;
+    height: .875rem;
+}
+
+input.input {
+    width: 2.75rem;
+    height: 2rem;
+    box-sizing: border-box;
+    padding: 0 .25rem;
+    border: 0;
+    border-radius: .5rem;
+    background: $ui-surface;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+input.input.is-wide {
+    width: 3.5rem;
+}
+
+input.input:focus {
+    box-shadow: 0 0 0 2px $motion-primary;
+}
+
+input.input::-webkit-inner-spin-button,
+input.input::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}

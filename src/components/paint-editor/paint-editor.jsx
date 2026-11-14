@@ -41,11 +41,14 @@ import StrokeColorIndicatorComponent from '../../containers/stroke-color-indicat
 import StrokeWidthIndicatorComponent from '../../containers/stroke-width-indicator.jsx';
 import TextMode from '../../containers/text-mode.jsx';
 
+
 import Formats, {isBitmap, isVector} from '../../lib/format';
 import Modes from '../../lib/modes';
 import styles from './paint-editor.css';
 
-import {Image, ZoomIn, ZoomOut, Scan, Palette, Shapes, TriangleAlert, X} from 'lucide-react';
+import {
+    Image, ZoomIn, ZoomOut, Scan, Palette, Shapes, TriangleAlert, X
+} from 'lucide-react';
 
 const messages = defineMessages({
     bitmap: {
@@ -83,27 +86,55 @@ const messages = defineMessages({
         defaultMessage: 'Shapes',
         description: 'Label for the phone toolbar button that opens the shape tools',
         id: 'paint.paintEditor.shapes'
+    },
+    moreShapes: {
+        defaultMessage: 'More shapes',
+        description: 'Label for the toolbar button that opens the less common shape tools',
+        id: 'paint.paintEditor.moreShapes'
+    },
+    formatVector: {
+        defaultMessage: 'Vector',
+        description: 'Label for the vector half of the switch between vector and bitmap costumes',
+        id: 'paint.paintEditor.formatVector'
+    },
+    formatBitmap: {
+        defaultMessage: 'Bitmap',
+        description: 'Label for the bitmap half of the switch between vector and bitmap costumes',
+        id: 'paint.paintEditor.formatBitmap'
+    },
+    format: {
+        defaultMessage: 'Costume format',
+        description: 'Name of the switch between vector and bitmap costumes, read by screen readers',
+        id: 'paint.paintEditor.format'
+    },
+    zoomActual: {
+        defaultMessage: 'Zoom to 100%',
+        description: 'Label for the zoom percentage button, which resets the zoom to actual size',
+        id: 'paint.paintEditor.zoomActual'
     }
 });
 
 const PHONE_QUERY = {maxWidth: 600};
 
-const SHAPE_MODES = [
+const PHONE_SHAPE_MODES = [
     Modes.LINE, Modes.OVAL, Modes.RECT, Modes.ROUNDED_RECT, Modes.TRIANGLE, Modes.SUSSY, Modes.ARROW,
     Modes.BIT_LINE, Modes.BIT_OVAL, Modes.BIT_RECT
 ];
 
+const MORE_SHAPE_MODES = [Modes.ROUNDED_RECT, Modes.TRIANGLE, Modes.SUSSY, Modes.ARROW];
+
+const ARRANGE_MODES = [Modes.SELECT, Modes.RESHAPE];
+
 const ResponsiveToolStrip = props => (
     <div className={styles.toolStripPanel}>
-        <div className={classNames(styles.modeSelector, props.modeSelectorClassName)}>
+        <div className={styles.modeSelector}>
             {props.children}
         </div>
     </div>
 );
 
 ResponsiveToolStrip.propTypes = {
-    children: PropTypes.node.isRequired,
-    modeSelectorClassName: PropTypes.string.isRequired
+    children: PropTypes.node.isRequired
 };
 
 const ShapeToolGroup = props => {
@@ -117,8 +148,8 @@ const ShapeToolGroup = props => {
         document.addEventListener('pointerdown', close);
         return () => document.removeEventListener('pointerdown', close);
     }, [open]);
-    const active = SHAPE_MODES.indexOf(props.mode) !== -1;
-    const label = props.intl.formatMessage(messages.shapes);
+    const active = props.modes.indexOf(props.mode) !== -1;
+    const label = props.intl.formatMessage(props.label);
     return (
         <div
             className={styles.shapeGroup}
@@ -154,21 +185,28 @@ const ShapeToolGroup = props => {
 ShapeToolGroup.propTypes = {
     children: PropTypes.node.isRequired,
     intl: intlShape,
-    mode: PropTypes.string
+    label: PropTypes.shape({
+        defaultMessage: PropTypes.string,
+        id: PropTypes.string
+    }).isRequired,
+    mode: PropTypes.string,
+    modes: PropTypes.arrayOf(PropTypes.string).isRequired
 };
 
-const shapeGroup = (intl, mode, shapes) => (
+const shapeGroup = (editor, shapes) => (
     <ShapeToolGroup
-        intl={intl}
+        intl={editor.intl}
         key="shapes"
-        mode={mode}
+        label={editor.phone ? messages.shapes : messages.moreShapes}
+        mode={editor.mode}
+        modes={editor.phone ? PHONE_SHAPE_MODES : MORE_SHAPE_MODES}
     >
         {shapes}
     </ShapeToolGroup>
 );
 
 const VectorTools = props => {
-    const shapes = [
+    const commonShapes = [
         <LineMode
             key="line"
             onUpdateImage={props.onUpdateImage}
@@ -180,7 +218,9 @@ const VectorTools = props => {
         <RectMode
             key="rect"
             onUpdateImage={props.onUpdateImage}
-        />,
+        />
+    ];
+    const moreShapes = [
         props.showRoundedRectMode ? (
             <RoundedRectMode
                 key="rounded-rect"
@@ -230,9 +270,11 @@ const VectorTools = props => {
             textArea={props.textArea}
             onUpdateImage={props.onUpdateImage}
         />
-    ].concat(props.phone ? [shapeGroup(props.intl, props.mode, shapes)] : shapes);
+    ].concat(props.phone ?
+        [shapeGroup(props, commonShapes.concat(moreShapes))] :
+        commonShapes.concat([shapeGroup(props, moreShapes)]));
     return (
-        <ResponsiveToolStrip modeSelectorClassName={styles.vectorModeSelector}>
+        <ResponsiveToolStrip>
             {tools}
         </ResponsiveToolStrip>
     );
@@ -277,9 +319,9 @@ const BitmapTools = props => {
             key="select"
             onUpdateImage={props.onUpdateImage}
         />
-    ], props.phone ? [shapeGroup(props.intl, props.mode, shapes)] : []);
+    ], props.phone ? [shapeGroup(props, shapes)] : []);
     return (
-        <ResponsiveToolStrip modeSelectorClassName={styles.bitmapModeSelector}>
+        <ResponsiveToolStrip>
             {tools}
         </ResponsiveToolStrip>
     );
@@ -294,7 +336,8 @@ const FixedTools = props => (
         onUndo={props.onUndo}
         onUpdateImage={props.onUpdateImage}
         onUpdateName={props.onUpdateName}
-        width={props.width}
+        phone={props.phone}
+        section={props.section}
     />
 );
 
@@ -304,6 +347,7 @@ const ModeTools = props => (
             onUpdateImage={props.onUpdateImage}
             width={props.width}
             height={props.height}
+            phone={props.phone}
             onManageFonts={props.onManageFonts}
         />
     </InputGroup>
@@ -311,56 +355,115 @@ const ModeTools = props => (
 
 const DesktopTop = props => (
     <div className={styles.editorContainerTop}>
-        <div className={styles.row}>
+        <div className={styles.headerMain}>
             <FixedTools {...props} />
-        </div>
-        {isVector(props.format) ?
-            <div className={styles.row}>
-                <InputGroup
-                    className={classNames(
-                        styles.row,
-                        styles.modDashedBorder,
-                        styles.modLabeledIconHeight
-                    )}
-                >
-                    <FillColorIndicatorComponent
-                        className={styles.modMarginAfter}
-                        onUpdateImage={props.onUpdateImage}
-                    />
+            <div className={styles.headerColors}>
+                <FillColorIndicatorComponent
+                    onUpdateImage={props.onUpdateImage}
+                />
+                {isVector(props.format) ? (
                     <StrokeColorIndicatorComponent
                         onUpdateImage={props.onUpdateImage}
                     />
+                ) : null}
+                {isVector(props.format) ? (
                     <StrokeWidthIndicatorComponent
+                        stepper
                         onUpdateImage={props.onUpdateImage}
                     />
-                </InputGroup>
-                <ModeTools
+                ) : null}
+            </div>
+        </div>
+        <div className={styles.headerContext}>
+            {isVector(props.format) && ARRANGE_MODES.indexOf(props.mode) !== -1 ? (
+                <FixedTools
                     {...props}
-                    groupClassName={styles.modModeTools}
+                    section="arrange"
                 />
-            </div> :
-            isBitmap(props.format) ?
-                <div className={styles.row}>
-                    <InputGroup
-                        className={classNames(
-                            styles.row,
-                            styles.modDashedBorder,
-                            styles.modLabeledIconHeight
-                        )}
-                    >
-                        <FillColorIndicatorComponent
-                            className={styles.modMarginAfter}
-                            onUpdateImage={props.onUpdateImage}
-                        />
-                    </InputGroup>
-                    <ModeTools
-                        {...props}
-                        groupClassName={styles.modModeTools}
-                    />
-                </div> : null
-        }
+            ) : null}
+            <ModeTools
+                {...props}
+                groupClassName={styles.modModeTools}
+            />
+        </div>
     </div>
 );
+
+const FormatSwitch = props => {
+    const vector = isVector(props.format);
+    const bitmap = isBitmap(props.format);
+    if (!vector && !bitmap) return null;
+    return (
+        <div
+            aria-label={props.intl.formatMessage(messages.format)}
+            className={styles.formatSwitch}
+            role="group"
+        >
+            <button
+                aria-pressed={vector}
+                className={classNames(styles.formatOption, {
+                    [styles.isSelected]: vector
+                })}
+                title={vector ? null : props.intl.formatMessage(messages.vectorHelp)}
+                type="button"
+                onClick={vector ? null : props.onSwitchToVector}
+            >
+                {props.intl.formatMessage(messages.formatVector)}
+            </button>
+            <button
+                aria-pressed={bitmap}
+                className={classNames(styles.formatOption, {
+                    [styles.isSelected]: bitmap
+                })}
+                title={bitmap ? null : props.intl.formatMessage(messages.bitmapHelp)}
+                type="button"
+                onClick={bitmap ? null : props.onSwitchToBitmap}
+            >
+                {props.intl.formatMessage(messages.formatBitmap)}
+            </button>
+        </div>
+    );
+};
+
+const ConvertButton = props => {
+    if (isVector(props.format)) {
+        return (
+            <Button
+                aria-label={props.intl.formatMessage(messages.bitmapHelp)}
+                className={styles.bitmapButton}
+                title={props.intl.formatMessage(messages.bitmapHelp)}
+                onClick={props.onSwitchToBitmap}
+            >
+                <Image
+                    className={styles.bitmapButtonIcon}
+                    draggable={false}
+                />
+                <span className={styles.buttonText}>
+                    {props.intl.formatMessage(messages.bitmap)}
+                </span>
+            </Button>
+        );
+    }
+    if (isBitmap(props.format)) {
+        return (
+            <Button
+                aria-label={props.intl.formatMessage(messages.vectorHelp)}
+                className={styles.bitmapButton}
+                title={props.intl.formatMessage(messages.vectorHelp)}
+                onClick={props.onSwitchToVector}
+            >
+                <Image
+                    className={styles.bitmapButtonIcon}
+                    draggable={false}
+                />
+                <span className={styles.buttonText}>
+                    {props.intl.formatMessage(messages.vector)}
+                </span>
+            </Button>
+        );
+    }
+    return null;
+};
 
 const PhoneTop = props => (
     <div className={styles.phoneBar}>
@@ -396,10 +499,80 @@ const PhoneContextBar = props => (
     </div>
 );
 
+const ZoomControls = props => {
+    const fit = (
+        <Button
+            aria-label="Fit artwork"
+            className={styles.buttonGroupButton}
+            title="Fit artwork"
+            onClick={props.onZoomReset}
+        >
+            <Scan
+                className={styles.buttonGroupButtonIcon}
+                draggable={false}
+            />
+        </Button>
+    );
+    return (
+        <InputGroup className={styles.zoomControls}>
+            <ButtonGroup className={styles.viewportControls}>
+                <Button
+                    aria-label="Canvas theme"
+                    className={styles.buttonGroupButton}
+                    title="Canvas theme"
+                    onClick={props.onChangeTheme}
+                >
+                    <Palette
+                        alt="Change theme"
+                        className={styles.buttonGroupButtonIcon}
+                        draggable={false}
+                    />
+                </Button>
+                <Button
+                    aria-label="Zoom out"
+                    className={classNames(styles.buttonGroupButton, styles.zoomStepButton)}
+                    title="Zoom out"
+                    onClick={props.onZoomOut}
+                >
+                    <ZoomOut
+                        alt="Zoom Out"
+                        className={styles.buttonGroupButtonIcon}
+                        draggable={false}
+                    />
+                </Button>
+                {props.phone ? fit : (
+                    <Button
+                        aria-label={props.intl.formatMessage(messages.zoomActual)}
+                        className={classNames(styles.buttonGroupButton, styles.zoomReadout)}
+                        title={props.intl.formatMessage(messages.zoomActual)}
+                        onClick={props.onZoomActual}
+                    >
+                        {`${props.zoomPercent}%`}
+                    </Button>
+                )}
+                <Button
+                    aria-label="Zoom in"
+                    className={classNames(styles.buttonGroupButton, styles.zoomStepButton)}
+                    title="Zoom in"
+                    onClick={props.onZoomIn}
+                >
+                    <ZoomIn
+                        alt="Zoom In"
+                        className={styles.buttonGroupButtonIcon}
+                        draggable={false}
+                    />
+                </Button>
+                {props.phone ? null : fit}
+            </ButtonGroup>
+        </InputGroup>
+    );
+};
+
 const PaintEditorLayout = props => (
     <div
         className={classNames(styles.editorContainer, {
-            [styles.phoneLayout]: props.phone
+            [styles.phoneLayout]: props.phone,
+            [styles.desktopLayout]: !props.phone
         })}
         dir={props.rtl ? 'rtl' : 'ltr'}
         data-paint-theme={props.theme}
@@ -483,89 +656,8 @@ const PaintEditorLayout = props => (
                 </ScrollableCanvas>
                 {props.phone && props.canvas !== null ? <PhoneContextBar {...props} /> : null}
                 <div className={styles.canvasControls}>
-                    {isVector(props.format) ?
-                        <Button
-                            aria-label={props.intl.formatMessage(messages.bitmapHelp)}
-                            className={styles.bitmapButton}
-                            title={props.intl.formatMessage(messages.bitmapHelp)}
-                            onClick={props.onSwitchToBitmap}
-                        >
-                            <Image
-                                className={styles.bitmapButtonIcon}
-                                draggable={false}
-                            />
-                            <span className={styles.buttonText}>
-                                {props.intl.formatMessage(messages.bitmap)}
-                            </span>
-                        </Button> :
-                        isBitmap(props.format) ?
-                            <Button
-                                aria-label={props.intl.formatMessage(messages.vectorHelp)}
-                                className={styles.bitmapButton}
-                                title={props.intl.formatMessage(messages.vectorHelp)}
-                                onClick={props.onSwitchToVector}
-                            >
-                                <Image
-                                    className={styles.bitmapButtonIcon}
-                                    draggable={false}
-                                />
-                                <span className={styles.buttonText}>
-                                    {props.intl.formatMessage(messages.vector)}
-                                </span>
-                            </Button> : null
-                    }
-                    {/* Zoom controls */}
-                    <InputGroup className={styles.zoomControls}>
-                        <ButtonGroup className={styles.viewportControls}>
-                            <Button
-                                aria-label="Canvas theme"
-                                className={styles.buttonGroupButton}
-                                title="Canvas theme"
-                                onClick={props.onChangeTheme}
-                            >
-                                <Palette
-                                    alt="Change theme"
-                                    className={styles.buttonGroupButtonIcon}
-                                    draggable={false}
-                                />
-                            </Button>
-                            <Button
-                                aria-label="Zoom out"
-                                className={classNames(styles.buttonGroupButton, styles.zoomStepButton)}
-                                title="Zoom out"
-                                onClick={props.onZoomOut}
-                            >
-                                <ZoomOut
-                                    alt="Zoom Out"
-                                    className={styles.buttonGroupButtonIcon}
-                                    draggable={false}
-                                />
-                            </Button>
-                            <Button
-                                aria-label="Fit artwork"
-                                className={styles.buttonGroupButton}
-                                title="Fit artwork"
-                                onClick={props.onZoomReset}
-                            >
-                                <Scan
-                                    className={styles.buttonGroupButtonIcon}
-                                    draggable={false}
-                                />
-                            </Button>
-                            <Button
-                                aria-label="Zoom in"
-                                className={classNames(styles.buttonGroupButton, styles.zoomStepButton)}
-                                title="Zoom in"
-                                onClick={props.onZoomIn}
-                            >
-                                <ZoomIn
-                                    alt="Zoom In"
-                                    className={styles.buttonGroupButtonIcon}
-                                    draggable={false}
-                                />
-                            </Button>
-                        </ButtonGroup>
-                    </InputGroup>
+                    {props.phone ? <ConvertButton {...props} /> : <FormatSwitch {...props} />}
+                    <ZoomControls {...props} />
                 </div>
             </div>
         </div>
@@ -612,6 +704,7 @@ const editorPropTypes = {
     onUndo: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     onUpdateName: PropTypes.func.isRequired,
+    onZoomActual: PropTypes.func,
     onZoomIn: PropTypes.func.isRequired,
     onZoomOut: PropTypes.func.isRequired,
     onZoomReset: PropTypes.func.isRequired,
@@ -619,6 +712,7 @@ const editorPropTypes = {
     rotationCenterX: PropTypes.number,
     rotationCenterY: PropTypes.number,
     rtl: PropTypes.bool,
+    section: PropTypes.string,
     setCanvas: PropTypes.func.isRequired,
     showNoiseNotice: PropTypes.bool,
     setTextArea: PropTypes.func.isRequired,
@@ -627,12 +721,16 @@ const editorPropTypes = {
     theme: PropTypes.string,
     width: PropTypes.number,
     height: PropTypes.number,
-    zoomLevelId: PropTypes.string
+    zoomLevelId: PropTypes.string,
+    zoomPercent: PropTypes.number
 };
 
 PaintEditorComponent.propTypes = editorPropTypes;
 PaintEditorLayout.propTypes = editorPropTypes;
 DesktopTop.propTypes = editorPropTypes;
+FormatSwitch.propTypes = editorPropTypes;
+ConvertButton.propTypes = editorPropTypes;
+ZoomControls.propTypes = editorPropTypes;
 PhoneTop.propTypes = editorPropTypes;
 PhoneContextBar.propTypes = editorPropTypes;
 VectorTools.propTypes = editorPropTypes;

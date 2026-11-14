@@ -12,40 +12,12 @@
     color-scheme: dark;
 }
 
-.row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.editor-container-top {
-    border-bottom: 1px dashed $ui-pane-border;
-    padding-bottom: calc(2 * $grid-unit);
-}
-
 .top-align-row {
     display: flex;
     flex-direction: row;
     height: 100%;
     padding-top: calc(5 * $grid-unit);
     min-width: 524px;
-}
-
-.row + .row {
-    margin-top: calc(2 * $grid-unit);
-}
-
-[dir="ltr"] .mod-dashed-border {
-    border-right: 1px dashed $ui-pane-border;
-    padding-right: calc(2 * $grid-unit);
-}
-
-[dir="rtl"] .mod-dashed-border {
-    border-left: 1px dashed $ui-pane-border;
-    padding-left: calc(2 * $grid-unit);
-}
-.mod-labeled-icon-height {
-    height: 2.85rem; /* for the second row so the dashed borders are equal in size */
 }
 
 $border-radius: 0.25rem;
@@ -110,18 +82,6 @@ $border-radius: 0.25rem;
 }
 [theme="dark"] .button-group-button-icon {
     filter: brightness(1.7);
-}
-
-.mod-mode-tools {
-    margin-left: calc(2 * $grid-unit);
-}
-
-[dir="ltr"] .mod-margin-after {
-    margin-right: calc(2 * $grid-unit);
-}
-
-[dir="rtl"] .mod-margin-after {
-    margin-left: calc(2 * $grid-unit);
 }
 
 .controls-container {
@@ -281,6 +241,241 @@ $border-radius: 0.25rem;
         margin-right: $grid-unit;
         margin-left: $grid-unit;
     }
+}
+
+$control: 2.25rem;
+$tool: 2.5rem;
+$tool-min: 1.75rem;
+$one-row-header: 82rem;
+
+.desktop-layout {
+    container: paint-editor / inline-size;
+    gap: .625rem;
+    padding: .75rem;
+    color: $text-primary;
+}
+
+.editor-container-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+        "main"
+        "context";
+    align-items: center;
+    gap: .5rem .75rem;
+}
+
+.header-main {
+    display: flex;
+    grid-area: main;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem .75rem;
+}
+
+.header-colors {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.header-colors > * {
+    margin: 0 !important;
+}
+
+.header-context {
+    display: flex;
+    grid-area: context;
+    min-width: 0;
+    min-height: $control;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem .75rem;
+}
+
+@container paint-editor (min-width: $one-row-header) {
+    .editor-container-top {
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-areas: "main context";
+    }
+
+    .header-main {
+        flex-wrap: nowrap;
+    }
+}
+
+.desktop-layout .top-align-row {
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    flex: 1 1 auto;
+    gap: .625rem;
+    padding-top: 0;
+}
+
+.desktop-layout .controls-container {
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+}
+
+.desktop-layout .canvas-container {
+    min-width: 12rem;
+    min-height: 8rem;
+    border-radius: .5rem;
+}
+
+.desktop-layout .mode-selector {
+    max-width: none;
+    min-height: 0;
+    flex: 0 0 auto;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 2px;
+    box-sizing: border-box;
+    width: calc($tool + 6px);
+    padding: 3px;
+    border-radius: .75rem;
+    background: $ui-soft;
+}
+
+.desktop-layout .shape-group {
+    min-height: $tool-min;
+    flex: 0 1 $tool;
+}
+
+.desktop-layout .shape-group-button {
+    width: $tool;
+    height: 100%;
+    border-radius: .5rem;
+}
+
+.desktop-layout .shape-group-button:hover {
+    background: $accent-soft;
+}
+
+.desktop-layout .shape-group-button.is-active,
+.desktop-layout .shape-group-button.is-active:hover {
+    color: $accent-foreground;
+    background: $motion-primary;
+}
+
+.desktop-layout .shape-popover,
+[dir="rtl"] .desktop-layout .shape-popover {
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: calc(100% + 3px + .25rem);
+    grid-auto-flow: row;
+    grid-auto-rows: $tool;
+    grid-template-rows: none;
+    grid-template-columns: $tool;
+    gap: 2px;
+    padding: 3px;
+    transform: translateY(-50%);
+}
+
+[dir="rtl"] .desktop-layout .shape-popover {
+    right: calc(100% + 3px + .25rem);
+    left: auto;
+}
+
+.desktop-layout .canvas-controls {
+    height: auto;
+    min-height: $control;
+    margin-top: .625rem;
+    align-items: center;
+    gap: .5rem .75rem;
+}
+
+.format-switch {
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 2px;
+    padding: 2px;
+    border-radius: .625rem;
+    background: $ui-soft;
+}
+
+.format-option {
+    height: 2rem;
+    margin: 0;
+    padding: 0 .75rem;
+    border: 0;
+    border-radius: .5rem;
+    background: transparent;
+    color: $text-primary;
+    font: inherit;
+    font-size: .75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.format-option:hover {
+    background: $accent-soft;
+}
+
+.format-option:focus-visible {
+    outline: 2px solid $motion-primary;
+    outline-offset: 1px;
+}
+
+.format-option.is-selected,
+.format-option.is-selected:hover {
+    background: $ui-surface;
+    color: $accent-text;
+    font-weight: 700;
+    box-shadow: 0 1px 2px $shadow-soft;
+    cursor: default;
+}
+
+.desktop-layout .zoom-controls {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.desktop-layout .viewport-controls {
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border-radius: .625rem;
+    background: $ui-soft;
+}
+
+.desktop-layout .viewport-controls .button-group-button,
+[dir="ltr"] .desktop-layout .viewport-controls .button-group-button,
+[dir="rtl"] .desktop-layout .viewport-controls .button-group-button {
+    display: inline-flex;
+    min-width: 2rem;
+    height: 2rem;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: .5rem;
+    color: $text-primary;
+}
+
+.desktop-layout .viewport-controls .button-group-button:hover {
+    background: $accent-soft;
+    color: $accent-text;
+}
+
+.desktop-layout .viewport-controls .button-group-button-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+[dir] .desktop-layout .viewport-controls .zoom-readout {
+    min-width: 3.25rem;
+    padding: 0 .25rem;
+    font-size: .75rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
 $phone-gap: .375rem;

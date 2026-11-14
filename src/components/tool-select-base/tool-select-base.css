@@ -41,15 +41,55 @@ img.tool-select-icon {
     filter: brightness(0) invert(1);
 }
 
-@media only screen and (max-width: $full-size-paint) {
+.key-hint {
+    display: none;
+}
+
+@media only screen and (min-width: 601px) {
     .mod-tool-select {
+        position: relative;
+        display: grid;
+        width: 2.5rem;
+        min-height: 1.75rem;
+        flex: 0 1 2.5rem;
+        box-sizing: border-box;
         margin: 0;
+        padding: 0;
+        border-radius: .5rem;
+        place-items: center;
+        transition: none;
+    }
+
+    .mod-tool-select:hover {
+        background: $accent-soft;
+    }
+
+    .mod-tool-select.is-selected,
+    .mod-tool-select.is-selected:hover {
+        background-color: $motion-primary;
     }
 
     svg.tool-select-icon,
     img.tool-select-icon {
-        width: 1rem;
-        height: 1rem;
+        width: 1.375rem;
+        height: 1.375rem;
+        color: $text-primary;
+    }
+
+    .key-hint {
+        position: absolute;
+        right: .25rem;
+        bottom: .0625rem;
+        display: block;
+        color: $text-secondary;
+        font-size: .5625rem;
+        font-weight: 700;
+        line-height: 1;
+        pointer-events: none;
+    }
+
+    .mod-tool-select.is-selected .key-hint {
+        color: $accent-foreground;
     }
 }
 
@@ -59,6 +99,7 @@ img.tool-select-icon {
         width: 100%;
         min-width: 0;
         min-height: 2.5rem;
+        margin: 0;
         padding: $grid-unit;
         place-items: center;
         touch-action: manipulation;

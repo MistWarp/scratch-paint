@@ -48,3 +48,10 @@
     width: 8.5rem;
     height: 2rem;
 }
+
+@media only screen and (min-width: 601px) {
+    .font-dropdown {
+        height: 2.25rem;
+        font-size: .875rem;
+    }
+}
