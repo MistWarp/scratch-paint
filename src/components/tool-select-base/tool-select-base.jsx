@@ -70,6 +70,14 @@ const ToolSelectComponent = props => {
             >
                 {iconElement}
             </span>
+            {keybinding ? (
+                <span
+                    className={styles.keyHint}
+                    aria-hidden
+                >
+                    {keybinding}
+                </span>
+            ) : null}
         </Button>
     );
 };

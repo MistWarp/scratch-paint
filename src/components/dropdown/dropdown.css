@@ -36,6 +36,47 @@ $arrow-border-width: 14px;
     padding-top: .2rem;
 }
 
+@media not all and (max-width: 600px) {
+    .dropdown {
+        display: inline-flex;
+        height: 2.25rem;
+        box-sizing: border-box;
+        align-items: center;
+        gap: .5rem;
+        padding: 0 .75rem;
+        border: 0;
+        border-radius: .625rem;
+        background: $ui-soft;
+        color: $text-primary;
+        font-size: .75rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .dropdown:hover,
+    .mod-open {
+        background: $ui-soft-strong;
+    }
+
+    .dropdown:focus-visible {
+        outline: 2px solid $motion-primary;
+        outline-offset: 1px;
+    }
+
+    .dropdown-icon,
+    [dir="ltr"] .dropdown-icon,
+    [dir="rtl"] .dropdown-icon {
+        width: .625rem;
+        height: .625rem;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dropdown-icon g {
+        color: inherit !important;
+    }
+}
+
 @media only screen and (max-width: 600px) {
     .dropdown {
         display: inline-flex;

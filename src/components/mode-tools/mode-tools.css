@@ -156,6 +156,10 @@ $border-radius: 0.25rem;
     background: $motion-transparent;
 }
 
+.mod-context-menu .mod-menu-item:focus-visible {
+    outline-offset: -2px;
+}
+
 .mod-top-divider {
     border-top: 1px solid $ui-pane-border;
 }
@@ -170,6 +174,31 @@ $border-radius: 0.25rem;
     width: 1.25rem;
     height: 1.25rem;
     flex: 0 0 auto;
+}
+
+.mode-tools.desktop-tools {
+    min-width: 0;
+    min-height: 2.25rem;
+    flex-wrap: wrap;
+    gap: .5rem .75rem;
+}
+
+.shape-dropdown {
+    display: inline-flex;
+    height: 2.25rem;
+    box-sizing: border-box;
+    align-items: center;
+    padding: 0 .75rem;
+    border: 0;
+    border-radius: .625rem;
+    background: $ui-soft;
+}
+
+.shape-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: .25rem 0;
 }
 
 @media only screen and (max-width: 600px) {

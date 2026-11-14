@@ -56,6 +56,7 @@ class StrokeWidthIndicator extends React.Component {
         return (
             <StrokeWidthIndicatorComponent
                 disabled={this.props.disabled}
+                stepper={this.props.stepper}
                 strokeWidth={this.props.strokeWidth}
                 onChangeStrokeWidth={this.handleChangeStrokeWidth}
             />
@@ -94,6 +95,7 @@ StrokeWidthIndicator.propTypes = {
     onChangeStrokeGradientType: PropTypes.func.isRequired,
     onChangeStrokeWidth: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
+    stepper: PropTypes.bool,
     strokeWidth: PropTypes.number,
     textEditTarget: PropTypes.number
 };

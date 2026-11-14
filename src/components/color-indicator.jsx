@@ -49,7 +49,9 @@ const ColorIndicatorComponent = props => (
                     <ColorButton
                         color={props.color}
                         color2={props.color2}
+                        disabled={props.disabled}
                         gradientType={props.gradientType}
+                        label={props.label}
                         onClick={props.onOpenColor}
                         outline={props.outline}
                     />

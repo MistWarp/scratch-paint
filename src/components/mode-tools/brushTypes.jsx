@@ -62,4 +62,5 @@ BrushTypesComponent.propTypes = {
     onBrushChange: PropTypes.func.isRequired
 };
 
+export {messages};
 export default injectIntl(BrushTypesComponent);

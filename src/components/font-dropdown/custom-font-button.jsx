@@ -14,6 +14,7 @@ class CustomFontButton extends React.Component {
         return (
             <Button
                 {...this.props}
+                onFocus={this.handleMouseOver}
                 onMouseOver={this.handleMouseOver}
             >
                 {this.props.children}

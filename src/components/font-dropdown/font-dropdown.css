@@ -20,6 +20,10 @@
     color: white;
 }
 
+.font-context-menu .mod-menu-item:focus-visible {
+    outline-offset: -2px;
+}
+
 .mod-context-menu {
     display: flex;
     flex-direction: column;
@@ -47,4 +51,11 @@
     justify-content: space-between;
     width: 8.5rem;
     height: 2rem;
+}
+
+@media not all and (max-width: 600px) {
+    .font-dropdown {
+        height: 2.25rem;
+        font-size: .875rem;
+    }
 }

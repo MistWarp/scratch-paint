@@ -25,3 +25,12 @@ $control-primary: #FFAB19;
 $data-primary: #FF8C1A;
 
 $form-border: var(--paint-form-border, #E9EEF2);
+
+$ui-soft: var(--ui-secondary, #e9f1fc);
+$ui-soft-strong: var(--ui-tertiary, #d9e3f2);
+$ui-surface: var(--ui-white, #ffffff);
+$accent-soft: var(--looks-transparent, hsla(260, 60%, 60%, 0.35));
+$accent-text: var(--accent-text, var(--paint-looks-secondary-default, #855cd6));
+$accent-foreground: var(--accent-foreground, #ffffff);
+$text-secondary: var(--text-primary-transparent, hsla(225, 15%, 40%, 0.75));
+$shadow-soft: var(--ui-black-transparent, hsla(0, 0%, 0%, 0.15));

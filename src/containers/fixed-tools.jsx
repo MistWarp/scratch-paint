@@ -68,7 +68,8 @@ class FixedTools extends React.Component {
                 onUngroup={this.handleUngroup}
                 onUpdateImage={this.props.onUpdateImage}
                 onUpdateName={this.props.onUpdateName}
-                width={this.props.width}
+                phone={this.props.phone}
+                section={this.props.section}
             />
         );
     }
@@ -84,8 +85,9 @@ FixedTools.propTypes = {
     onUndo: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     onUpdateName: PropTypes.func.isRequired,
-    setSelectedItems: PropTypes.func.isRequired,
-    width: PropTypes.number
+    phone: PropTypes.bool,
+    section: PropTypes.string,
+    setSelectedItems: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({

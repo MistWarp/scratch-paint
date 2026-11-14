@@ -1,0 +1,105 @@
+@import "../../css/colors.css";
+
+.group {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border-radius: .625rem;
+    background: $ui-soft;
+}
+
+.button {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: .375rem;
+    min-width: 2rem;
+    height: 2rem;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: .5rem;
+    background: transparent;
+    color: $text-primary;
+    font: inherit;
+    font-size: .75rem;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+}
+
+.button.has-text {
+    padding: 0 .625rem;
+}
+
+.button:hover:not(:disabled) {
+    background: $accent-soft;
+    color: $accent-text;
+}
+
+.button:focus-visible {
+    outline: 2px solid $motion-primary;
+    outline-offset: 1px;
+}
+
+.button:disabled {
+    opacity: .35;
+    cursor: default;
+}
+
+.button.is-active,
+.button.is-active:hover:not(:disabled) {
+    background: $motion-primary;
+    color: $accent-foreground;
+}
+
+.icon {
+    display: block;
+    flex: 0 0 auto;
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+[theme="dark"] img.icon {
+    filter: brightness(1.7);
+}
+
+@media not all and (max-width: 600px) {
+    [data-ui-theme="dark"] img.icon {
+        filter: brightness(0) invert(.93);
+    }
+}
+
+.button.is-active img.icon {
+    filter: brightness(0) invert(1);
+}
+
+[dir="rtl"] .mirror-in-rtl .icon {
+    transform: scaleX(-1);
+}
+
+.field {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: .375rem;
+    margin: 0;
+}
+
+.field-label {
+    color: $text-secondary;
+    font-size: .75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.hint {
+    color: $text-secondary;
+    font-size: .75rem;
+    white-space: nowrap;
+}

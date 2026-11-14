@@ -521,6 +521,7 @@ class ModeTools extends React.Component {
                 onMaskShape={this.handleMaskShape}
                 onSubtractShape={this.handleSubtractShape}
                 onExcludeShape={this.handleExcludeShape}
+                phone={this.props.phone}
             />
         );
     }
@@ -535,6 +536,7 @@ ModeTools.propTypes = {
     onManageFonts: PropTypes.func,
     onPasteFromClipboard: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
+    phone: PropTypes.bool,
     width: PropTypes.number,
     height: PropTypes.number,
     // Listen on selected items to update hasSelectedPoints

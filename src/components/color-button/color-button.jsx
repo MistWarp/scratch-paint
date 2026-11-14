@@ -29,17 +29,17 @@ const ColorButtonComponent = props => (
         className={classNames(styles.colorButton, {
             [styles.modCompact]: props.compact
         })}
-        aria-disabled={props.compact && props.disabled ? 'true' : null}
-        role={props.compact ? 'button' : null}
-        tabIndex={props.compact && !props.disabled ? 0 : null}
+        aria-disabled={props.disabled ? 'true' : null}
+        role="button"
+        tabIndex={props.disabled ? null : 0}
         title={props.label}
         onClick={props.onClick}
-        onKeyDown={props.compact ? event => { // eslint-disable-line react/jsx-no-bind
+        onKeyDown={event => { // eslint-disable-line react/jsx-no-bind
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
                 props.onClick(event);
             }
-        } : null}
+        }}
     >
         <div
             className={classNames(styles.colorButtonSwatch, {

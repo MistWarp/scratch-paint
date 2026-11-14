@@ -32,6 +32,8 @@ import bindAll from 'lodash.bindall';
 
 window.paper = paper;
 
+const ACTUAL_SIZE_ZOOM = 0.5;
+
 /**
  * The top-level paint editor component. See README for more details on usage.
  *
@@ -90,6 +92,7 @@ class PaintEditor extends React.Component {
             'handleSetSelectedItems',
             'handleChangeTheme',
             'handleDismissNoiseNotice',
+            'handleZoomActual',
             'handleZoomIn',
             'handleZoomOut',
             'handleZoomReset'
@@ -257,6 +260,11 @@ class PaintEditor extends React.Component {
         this.props.updateViewBounds(paper.view.matrix);
         this.handleSetSelectedItems();
     }
+    handleZoomActual () {
+        zoomOnSelection(ACTUAL_SIZE_ZOOM - paper.view.zoom);
+        this.props.updateViewBounds(paper.view.matrix);
+        this.handleSetSelectedItems();
+    }
     handleZoomReset () {
         zoomToFit(isBitmap(this.props.format), window.matchMedia('(max-width: 600px)').matches);
         this.props.updateViewBounds(paper.view.matrix);
@@ -366,9 +374,11 @@ class PaintEditor extends React.Component {
                 setTextArea={this.setTextArea}
                 textArea={this.state.textArea}
                 theme={this.getEffectiveTheme()}
+                uiTheme={this.props.theme}
                 width={this.props.width}
                 height={this.props.height}
                 zoomLevelId={this.props.zoomLevelId}
+                zoomPercent={paper.view ? Math.round((paper.view.zoom / ACTUAL_SIZE_ZOOM) * 100) : 100}
                 showNoiseNotice={this.state.showNoiseNotice}
                 onChangeTheme={this.handleChangeTheme}
                 onDismissNoiseNotice={this.handleDismissNoiseNotice}
@@ -380,6 +390,7 @@ class PaintEditor extends React.Component {
                 onUndo={this.props.onUndo}
                 onUpdateImage={this.props.onUpdateImage}
                 onUpdateName={this.props.onUpdateName}
+                onZoomActual={this.handleZoomActual}
                 onZoomIn={this.handleZoomIn}
                 onZoomOut={this.handleZoomOut}
                 onZoomReset={this.handleZoomReset}

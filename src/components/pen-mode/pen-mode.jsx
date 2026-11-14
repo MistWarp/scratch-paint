@@ -13,6 +13,7 @@ const PenModeComponent = props => (
         }}
         icon={PenTool}
         isSelected={props.isSelected}
+        keybinding="P"
         onMouseDown={props.onMouseDown}
     />
 );

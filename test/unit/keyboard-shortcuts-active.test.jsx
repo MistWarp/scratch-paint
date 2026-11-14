@@ -58,4 +58,17 @@ describe('KeyboardShortcutsHOC isActive', () => {
         expect(store.getState().scratchPaint.mode).toBe(Modes.RECT);
         expect(wrapper.find(Stub).prop('isActive')).toBeUndefined();
     });
+
+    test('P picks the pen for vector costumes only', () => {
+        const {store, onKeyPress} = renderWith({});
+        onKeyPress(keyEvent('p'));
+        expect(store.getState().scratchPaint.mode).toBe(Modes.PEN);
+
+        store.dispatch(changeFormat(Formats.BITMAP));
+        const before = store.getState().scratchPaint.mode;
+        const event = keyEvent('p');
+        onKeyPress(event);
+        expect(store.getState().scratchPaint.mode).toBe(before);
+        expect(event.preventDefault).not.toHaveBeenCalled();
+    });
 });

@@ -33,6 +33,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverSansSerif}
                     onMouseOver={props.onHoverSansSerif}
                 >
                     <DisplayFont
@@ -43,6 +44,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverSerif}
                     onMouseOver={props.onHoverSerif}
                 >
                     <DisplayFont
@@ -53,6 +55,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverHandwriting}
                     onMouseOver={props.onHoverHandwriting}
                 >
                     <DisplayFont
@@ -63,6 +66,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverMarker}
                     onMouseOver={props.onHoverMarker}
                 >
                     <DisplayFont
@@ -73,6 +77,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverCurly}
                     onMouseOver={props.onHoverCurly}
                 >
                     <DisplayFont
@@ -83,6 +88,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverPixel}
                     onMouseOver={props.onHoverPixel}
                 >
                     <DisplayFont
@@ -93,6 +99,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverPlayful}
                     onMouseOver={props.onHoverPlayful}
                 >
                     <DisplayFont
@@ -103,6 +110,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverBubbly}
                     onMouseOver={props.onHoverBubbly}
                 >
                     <DisplayFont
@@ -113,6 +121,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverArcade}
                     onMouseOver={props.onHoverArcade}
                 >
                     <DisplayFont
@@ -123,6 +132,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverBitsAndBytes}
                     onMouseOver={props.onHoverBitsAndBytes}
                 >
                     <DisplayFont
@@ -133,6 +143,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverTechnological}
                     onMouseOver={props.onHoverTechnological}
                 >
                     <DisplayFont
@@ -143,6 +154,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverScratch}
                     onMouseOver={props.onHoverScratch}
                 >
                     <DisplayFont
@@ -153,6 +165,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverArchivo}
                     onMouseOver={props.onHoverArchivo}
                 >
                     <DisplayFont
@@ -163,6 +176,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverArchivoBlack}
                     onMouseOver={props.onHoverArchivoBlack}
                 >
                     <DisplayFont
@@ -173,6 +187,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverChinese}
                     onMouseOver={props.onHoverChinese}
                 >
                     <DisplayFont
@@ -183,6 +198,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverJapanese}
                     onMouseOver={props.onHoverJapanese}
                 >
                     <DisplayFont
@@ -193,6 +209,7 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onFocus={props.onHoverKorean}
                     onMouseOver={props.onHoverKorean}
                 >
                     <DisplayFont

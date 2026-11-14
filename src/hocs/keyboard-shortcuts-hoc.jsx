@@ -21,6 +21,7 @@ const VECTOR_KEYBINDINGS = {
     a: Modes.RESHAPE,
     b: Modes.BRUSH,
     e: Modes.ERASER,
+    p: Modes.PEN,
     f: Modes.FILL,
     t: Modes.TEXT,
     l: Modes.LINE,
